@@ -1,0 +1,1 @@
+# This is a folder for notes on the chess project
