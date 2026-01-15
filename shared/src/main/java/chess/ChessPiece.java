@@ -1,9 +1,8 @@
 package chess;
 
-import chess.movecalculator.BishopCalc;
+import chess.movecalculator.SlidingCalc;
 import chess.movecalculator.KnightCalc;
 import chess.movecalculator.PawnCalc;
-import chess.movecalculator.RookCalc;
 
 import java.util.*;
 
@@ -62,11 +61,8 @@ public class ChessPiece {
 
         List<ChessMove> possMove = new ArrayList<>();
 
-        if (myPiece == PieceType.BISHOP || myPiece == PieceType.QUEEN || myPiece == PieceType.KING) {
-            possMove.addAll(new BishopCalc(board, myPosition).getPieceMoves());
-        }
-        if (myPiece == PieceType.ROOK || myPiece == PieceType.QUEEN || myPiece == PieceType.KING) {
-            possMove.addAll(new RookCalc(board, myPosition).getPieceMoves());
+        if (myPiece != PieceType.KNIGHT && myPiece != PieceType.PAWN) {
+            possMove.addAll(new SlidingCalc(board, myPosition).getPieceMoves());
         }
         if (myPiece == PieceType.KNIGHT){
             possMove.addAll(new KnightCalc(board, myPosition).getPieceMoves());
