@@ -1,4 +1,4 @@
-package chess.MoveCalculator;
+package chess.movecalculator;
 
 import chess.ChessBoard;
 import chess.ChessMove;
@@ -22,17 +22,16 @@ public class KnightCalc implements MoveCalc{
 
     @Override public List<ChessMove> getPieceMoves() {
         ChessPiece piece = board.getPiece(myPosition);
-        ChessPiece.PieceType myPiece = piece.getPieceType();
         int startRow = myPosition.getRow();
         int startCol = myPosition.getColumn();
 
-        for(int[] way: Arrays.copyOfRange(straight, 0, 2)){
+        for(int[] way: Arrays.copyOfRange(STRAIGHT, 0, 2)){
             for(int i = 1; i < 3; i++ ){
                 int newRow = startRow + (way[0] * i);
-                if (newRow > boardMax || newRow < boardMin){break;}
+                if (newRow > BOARD_MAX || newRow < BOARD_MIN){break;}
                 for(int j = -1; j < 2; j +=2){
                     int newCol = startCol + ((3 - i) * j);
-                    if(newCol > boardMax || newCol < boardMin){continue;}
+                    if(newCol > BOARD_MAX || newCol < BOARD_MIN){continue;}
                     ChessPosition newMove = new ChessPosition(newRow, newCol);
                     ChessPiece selectPiece = board.getPiece(newMove);
 

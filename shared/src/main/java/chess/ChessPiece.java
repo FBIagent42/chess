@@ -1,9 +1,9 @@
 package chess;
 
-import chess.MoveCalculator.BishopCalc;
-import chess.MoveCalculator.KnightCalc;
-import chess.MoveCalculator.PawnCalc;
-import chess.MoveCalculator.RookCalc;
+import chess.movecalculator.BishopCalc;
+import chess.movecalculator.KnightCalc;
+import chess.movecalculator.PawnCalc;
+import chess.movecalculator.RookCalc;
 
 import java.util.*;
 
@@ -59,12 +59,6 @@ public class ChessPiece {
     public Collection<ChessMove> pieceMoves(ChessBoard board, ChessPosition myPosition) {
         ChessPiece piece = board.getPiece(myPosition);
         PieceType myPiece = piece.getPieceType();
-        int startRow = myPosition.getRow();
-        int startCol = myPosition.getColumn();
-        int[][] diag = {{1, 1}, {-1, 1}, {-1, -1}, {1, -1}};
-        int[][] straight = {{1, 0}, {-1, 0}, {0, -1}, {0, 1}};
-        int boardMin = 1;
-        int boardMax = 8;
 
         List<ChessMove> possMove = new ArrayList<>();
 

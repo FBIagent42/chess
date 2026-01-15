@@ -11,7 +11,7 @@ import java.util.Objects;
  */
 public class ChessBoard {
 
-    private final int BOARD_MAX = 8;
+    private final static int BOARD_MAX = 8;
 
     ChessPiece[][] squares = new ChessPiece[BOARD_MAX][BOARD_MAX];
     public ChessBoard() {

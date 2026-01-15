@@ -1,9 +1,8 @@
-package chess.MoveCalculator;
+package chess.movecalculator;
 
 import chess.*;
 
 import java.util.ArrayList;
-import java.util.Collection;
 import java.util.List;
 
 public class PawnCalc implements MoveCalc {
@@ -19,7 +18,6 @@ public class PawnCalc implements MoveCalc {
 
     @Override public List<ChessMove> getPieceMoves() {
         ChessPiece piece = board.getPiece(myPosition);
-        ChessPiece.PieceType myPiece = piece.getPieceType();
         int startRow = myPosition.getRow();
         int startCol = myPosition.getColumn();
 
@@ -36,14 +34,14 @@ public class PawnCalc implements MoveCalc {
 
         for (int i = -1; i < 2; i++) {
             int newCol = startCol + i;
-            if (newCol < boardMin || newCol > boardMax) {
+            if (newCol < BOARD_MIN || newCol > BOARD_MAX) {
                 continue;
             }
             ChessPosition newMove = new ChessPosition(newRow, newCol);
             ChessPiece selectPiece = board.getPiece(newMove);
             if ((selectPiece == null && i == 0)
                     || (selectPiece != null && i != 0 && selectPiece.getTeamColor() != piece.getTeamColor())) {
-                if ((newRow == boardMax || newRow == boardMin)) {
+                if ((newRow == BOARD_MAX || newRow == BOARD_MIN)) {
                     for (ChessPiece.PieceType promote : ChessPiece.PieceType.values()) {
                         if (promote == ChessPiece.PieceType.PAWN || promote == ChessPiece.PieceType.KING) {
                             continue;
