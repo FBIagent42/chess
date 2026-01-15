@@ -13,17 +13,20 @@ public class SlidingCalc implements MoveCalc{
     private final ChessBoard board;
     private final ChessPosition myPosition;
     private final List<ChessMove> possMove = new ArrayList<>();
+    private final int startRow;
+    private final int startCol;
+    private final ChessPiece.PieceType myPiece;
 
     public SlidingCalc(ChessBoard board, ChessPosition myPosition){
         this.board = board;
         this.myPosition = myPosition;
+        this.startRow = myPosition.getRow();
+        this.startCol = myPosition.getColumn();
+        ChessPiece piece = board.getPiece(myPosition);
+        this.myPiece = piece.getPieceType();
     }
 
     @Override public List<ChessMove> getPieceMoves() {
-        ChessPiece piece = board.getPiece(myPosition);
-        ChessPiece.PieceType myPiece = piece.getPieceType();
-        int startRow = myPosition.getRow();
-        int startCol = myPosition.getColumn();
 
         List<int[][]> directions = new ArrayList<>();
         if(myPiece != ChessPiece.PieceType.BISHOP){directions.add(STRAIGHT);}
@@ -38,7 +41,7 @@ public class SlidingCalc implements MoveCalc{
                      newRow += wayRow, newCol += wayCol) {
                     ChessPosition newMove = new ChessPosition(newRow, newCol);
 
-                    boolean occupied = moveOccupied(piece, newMove);
+                    boolean occupied = moveOccupied(possMove, board, myPosition, newMove);
                     if (myPiece == ChessPiece.PieceType.KING || occupied) {
                         break;
                     }
@@ -48,17 +51,4 @@ public class SlidingCalc implements MoveCalc{
         return possMove;
     }
 
-    private boolean moveOccupied(ChessPiece piece, ChessPosition newMove){
-        ChessPiece selectPiece = board.getPiece(newMove);
-
-        if (selectPiece == null) {
-            possMove.add(new ChessMove(myPosition, newMove, null));
-        } else {
-            if (selectPiece.getTeamColor() != piece.getTeamColor()) {
-                possMove.add(new ChessMove(myPosition, newMove, null));
-            }
-            return true;
-        }
-        return false;
-    }
 }

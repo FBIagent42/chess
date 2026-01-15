@@ -1,6 +1,9 @@
 package chess.movecalculator;
 
+import chess.ChessBoard;
 import chess.ChessMove;
+import chess.ChessPiece;
+import chess.ChessPosition;
 
 import java.util.*;
 
@@ -14,5 +17,20 @@ public interface MoveCalc {
 
     default List<ChessMove> getPieceMoves(){
         return new ArrayList<>();
+    }
+
+    default boolean moveOccupied(List<ChessMove> possMove, ChessBoard board, ChessPosition myPosition, ChessPosition newMove){
+        ChessPiece piece = board.getPiece(myPosition);
+        ChessPiece selectPiece = board.getPiece(newMove);
+
+        if (selectPiece == null) {
+            possMove.add(new ChessMove(myPosition, newMove, null));
+        } else {
+            if (selectPiece.getTeamColor() != piece.getTeamColor()) {
+                possMove.add(new ChessMove(myPosition, newMove, null));
+            }
+            return true;
+        }
+        return false;
     }
 }
