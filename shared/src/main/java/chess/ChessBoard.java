@@ -79,11 +79,13 @@ public class ChessBoard {
         squares[7][4] = new ChessPiece(ChessGame.TeamColor.BLACK, ChessPiece.PieceType.KING );
     }
 
+
     @Override
     public boolean equals(Object o) {
-        if (!(o instanceof ChessBoard that)) {
+        if (o == null || getClass() != o.getClass()) {
             return false;
         }
+        ChessBoard that = (ChessBoard) o;
         return Objects.deepEquals(squares, that.squares);
     }
 

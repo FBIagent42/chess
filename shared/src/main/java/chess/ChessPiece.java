@@ -1,5 +1,10 @@
 package chess;
 
+import chess.MoveCalculator.BishopCalc;
+import chess.MoveCalculator.KnightCalc;
+import chess.MoveCalculator.PawnCalc;
+import chess.MoveCalculator.RookCalc;
+
 import java.util.*;
 
 /**
@@ -64,123 +69,32 @@ public class ChessPiece {
         List<ChessMove> possMove = new ArrayList<>();
 
         if (myPiece == PieceType.BISHOP || myPiece == PieceType.QUEEN || myPiece == PieceType.KING) {
-
-            for (int[] way : diag) {
-                int wayRow = way[0];
-                int wayCol = way[1];
-                for (int newRow = startRow + wayRow, newCol = startCol + wayCol;
-                     newRow <= boardMax && newRow >= boardMin && newCol <= boardMax && newCol >= boardMin;
-                     newRow += wayRow, newCol += wayCol) {
-                    ChessPosition newMove = new ChessPosition(newRow, newCol);
-                    ChessPiece selectPiece = board.getPiece(newMove);
-
-                    if (selectPiece == null) {
-                        possMove.add(new ChessMove(myPosition, newMove, null));
-                    } else {
-                        if (selectPiece.getTeamColor() != piece.getTeamColor()) {
-                            possMove.add(new ChessMove(myPosition, newMove, null));
-                        }
-                        break;
-                    }
-                    if(myPiece == PieceType.KING){
-                        break;
-                    }
-                }
-            }
+            possMove.addAll(new BishopCalc(board, myPosition).getPieceMoves());
         }
         if (myPiece == PieceType.ROOK || myPiece == PieceType.QUEEN || myPiece == PieceType.KING) {
-            for (int[] way : straight) {
-                int wayRow = way[0];
-                int wayCol = way[1];
-                for (int newRow = startRow + wayRow, newCol = startCol + wayCol;
-                     newRow <= boardMax && newRow >= boardMin && newCol <= boardMax && newCol >= boardMin;
-                     newRow += wayRow, newCol += wayCol) {
-                    ChessPosition newMove = new ChessPosition(newRow, newCol);
-                    ChessPiece selectPiece = board.getPiece(newMove);
-
-                    if (selectPiece == null) {
-                        possMove.add(new ChessMove(myPosition, newMove, null));
-                    } else {
-                        if (selectPiece.getTeamColor() != piece.getTeamColor()) {
-                            possMove.add(new ChessMove(myPosition, newMove, null));
-                        }
-                        break;
-                    }
-                    if(myPiece == PieceType.KING){
-                        break;
-                    }
-                }
-            }
+            possMove.addAll(new RookCalc(board, myPosition).getPieceMoves());
         }
         if (myPiece == PieceType.KNIGHT){
-            for(int[] way: Arrays.copyOfRange(straight, 0, 2)){
-                for(int i = 1; i < 3; i++ ){
-                    int newRow = startRow + (way[0] * i);
-                    if (newRow > boardMax || newRow < boardMin){break;}
-                    for(int j = -1; j < 2; j +=2){
-                        int newCol = startCol + ((3 - i) * j);
-                        if(newCol > boardMax || newCol < boardMin){continue;}
-                        ChessPosition newMove = new ChessPosition(newRow, newCol);
-                        ChessPiece selectPiece = board.getPiece(newMove);
-
-                        if (selectPiece == null) {
-                            possMove.add(new ChessMove(myPosition, newMove, null));
-                        } else {
-                            if (selectPiece.getTeamColor() != piece.getTeamColor()) {
-                                possMove.add(new ChessMove(myPosition, newMove, null));
-                            }
-                        }
-                    }
-                }
-            }
+            possMove.addAll(new KnightCalc(board, myPosition).getPieceMoves());
         }
         if (myPiece == PieceType.PAWN){
-            int face = 0;
-            int start = 0;
-            if(piece.getTeamColor() == ChessGame.TeamColor.WHITE){face = 1; start = 2;}
-            else{face = -1; start = 7;}
-            int newRow = startRow + face;
-
-            for(int i = -1; i < 2; i++) {
-                int newCol = startCol + i;
-                if (newCol < boardMin || newCol > boardMax){continue;}
-                ChessPosition newMove = new ChessPosition(newRow, newCol);
-                ChessPiece selectPiece = board.getPiece(newMove);
-                if ((selectPiece == null && i == 0)
-                        || (selectPiece != null && i != 0 && selectPiece.getTeamColor() != piece.getTeamColor())) {
-                    if ((newRow == boardMax || newRow == boardMin)) {
-                        for (PieceType promote : PieceType.values()) {
-                            if (promote == PieceType.PAWN || promote == PieceType.KING) {
-                                continue;
-                            }
-                            possMove.add(new ChessMove(myPosition, newMove, promote));
-                        }
-                    } else {
-                        possMove.add(new ChessMove(myPosition, newMove, null));
-                    }
-                }
-            }
-
-            if(startRow == start
-                    && board.getPiece(new ChessPosition(startRow + face, startCol)) == null
-                    && board.getPiece(new ChessPosition(startRow + (2 * face), startCol)) == null){
-                possMove.add(new ChessMove(myPosition ,new ChessPosition(startRow + (2 * face), startCol), null));
-            }
+            possMove.addAll(new PawnCalc(board, myPosition).getPieceMoves());
         }
         return possMove;
     }
 
-        @Override
-        public boolean equals (Object o){
-            if (!(o instanceof ChessPiece that)) {
-                return false;
-            }
-            return pieceColor == that.pieceColor && type == that.type;
-        }
 
-        @Override
-        public int hashCode () {
-            return Objects.hash(pieceColor, type);
+    @Override
+    public boolean equals(Object o) {
+        if (o == null || getClass() != o.getClass()) {
+            return false;
         }
+        ChessPiece that = (ChessPiece) o;
+        return pieceColor == that.pieceColor && type == that.type;
+    }
 
+    @Override
+    public int hashCode() {
+        return Objects.hash(pieceColor, type);
+    }
 }
