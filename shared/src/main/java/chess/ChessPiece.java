@@ -81,6 +81,10 @@ public class ChessPiece {
         return possMove;
     }
 
+    @Override
+    public String toString() {
+        return String.format("%s %s", pieceColor, type);
+    }
 
     @Override
     public boolean equals(Object o) {
