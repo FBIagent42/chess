@@ -18,6 +18,14 @@ public class ChessBoard {
         
     }
 
+    public ChessBoard(ChessBoard copy){
+        squares = copy.getBoard();
+    }
+
+    public ChessPiece[][] getBoard(){
+        return squares;
+    }
+
     /**
      * Adds a chess piece to the chessboard
      *
