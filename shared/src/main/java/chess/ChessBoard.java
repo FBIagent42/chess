@@ -19,7 +19,12 @@ public class ChessBoard {
     }
 
     public ChessBoard(ChessBoard copy){
-        squares = copy.getBoard();
+        squares = new ChessPiece[8][8];
+        ChessPiece[][] squaresCopy = copy.getBoard();
+
+        for(int row = 0; row < 8; row++){
+            System.arraycopy(squaresCopy[row], 0, squares[row], 0, 8);
+        }
     }
 
     public ChessPiece[][] getBoard(){
@@ -87,6 +92,23 @@ public class ChessBoard {
         squares[7][4] = new ChessPiece(ChessGame.TeamColor.BLACK, ChessPiece.PieceType.KING );
     }
 
+    @Override
+    public String toString() {
+        StringBuilder sb = new StringBuilder();
+
+        for(int row = 7; row > -1; row--){
+            for(int col = 0; col < 8; col++){
+                if(squares[row][col] == null){
+                    sb.append("[ ]");
+                }else {
+                    sb.append("[").append(squares[row][col].toString()).append("]");
+                }
+            }
+            sb.append("\n");
+        }
+
+        return sb.toString();
+    }
 
     @Override
     public boolean equals(Object o) {
