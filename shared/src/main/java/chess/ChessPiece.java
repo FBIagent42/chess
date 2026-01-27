@@ -83,7 +83,18 @@ public class ChessPiece {
 
     @Override
     public String toString() {
-        return String.format("%s %s", pieceColor, type);
+        char piece;
+        switch (type){
+            case KING -> piece = 'k';
+            case QUEEN -> piece = 'q';
+            case ROOK -> piece = 'r';
+            case BISHOP -> piece = 'b';
+            case KNIGHT -> piece = 'n';
+            case PAWN -> piece = 'p';
+            case null, default -> piece = ' ';
+        }
+        if(pieceColor == ChessGame.TeamColor.WHITE){piece = Character.toUpperCase(piece);}
+        return String.format("%c", piece);
     }
 
     @Override
