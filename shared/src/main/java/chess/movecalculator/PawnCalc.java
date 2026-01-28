@@ -15,8 +15,10 @@ public class PawnCalc implements MoveCalc {
     private final int startCol;
     private final int direction;
     private final int origRow;
+    private final ChessMove lastMove;
 
-    public PawnCalc(ChessBoard board, ChessPosition myPosition){
+    public PawnCalc(ChessBoard board, ChessPosition myPosition, ChessMove lastMove){
+        this.lastMove = lastMove;
         this.board = board;
         this.myPosition = myPosition;
         piece = board.getPiece(myPosition);
@@ -29,6 +31,10 @@ public class PawnCalc implements MoveCalc {
             origRow = 7;
         }
         newRow = myPosition.getRow() + direction;
+    }
+
+    public PawnCalc(ChessBoard board, ChessPosition myPosition){
+        this(board, myPosition, null);
     }
 
     @Override public List<ChessMove> getPieceMoves() {
@@ -50,6 +56,23 @@ public class PawnCalc implements MoveCalc {
         }
 
         return possMove;
+    }
+
+    private int canPassant(){
+        ChessPiece.PieceType lastPiece =  board.getPiece(lastMove.getEndPosition()).getPieceType();
+        int startRow = newRow - direction;
+        int lastMoveCol = lastMove.getEndPosition().getColumn();
+        int lastMoveRow = lastMove.getEndPosition().getRow();
+
+        if(lastPiece == ChessPiece.PieceType.PAWN && lastMoveRow == startRow){
+            if(lastMoveCol == startCol + 1){
+                return 1;
+            }else if(lastMoveCol == startCol - 1){
+                return -1;
+            }
+        }
+
+        return 0;
     }
 
     @Override

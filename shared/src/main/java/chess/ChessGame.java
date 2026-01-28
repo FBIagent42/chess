@@ -24,7 +24,6 @@ public class ChessGame {
         board.resetBoard();
         whiteKing = new int[]{1, 5};
         blackKing = new int[]{8, 5};
-
     }
 
     /**
@@ -69,9 +68,17 @@ public class ChessGame {
         for(ChessMove move: possMove){
             board = new ChessBoard(trueBoard);
             ChessPosition endPosition = move.getEndPosition();
-
+            int startCol = startPosition.getColumn();
+            if(piece.getPieceType() == ChessPiece.PieceType.PAWN
+                    && board.getPiece(endPosition) == null
+                    && endPosition.getColumn() != startCol){
+                ChessPosition pawnPos = new ChessPosition(startPosition.getRow(), endPosition.getColumn());
+                board.addPiece(pawnPos, null);
+            } else{
+                board.addPiece(startPosition, null);
+            }
             board.addPiece(endPosition, piece);
-            board.addPiece(startPosition, null);
+
 
             if(isInCheck(piece.getTeamColor())){
                 invalidMove.add(move);
