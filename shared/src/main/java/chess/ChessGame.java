@@ -64,17 +64,21 @@ public class ChessGame {
         Collection<ChessMove> possMove = piece.pieceMoves(board, startPosition);
         Collection<ChessMove> invalidMove = new ArrayList<>();
 
+        ChessBoard trueBoard  = board;
+
         for(ChessMove move: possMove){
-            ChessBoard testBoard  = new ChessBoard(board);
+            board = new ChessBoard(trueBoard);
             ChessPosition endPosition = move.getEndPosition();
 
-            testBoard.addPiece(endPosition, piece);
-            testBoard.addPiece(startPosition, null);
+            board.addPiece(endPosition, piece);
+            board.addPiece(startPosition, null);
 
             if(isInCheck(piece.getTeamColor())){
                 invalidMove.add(move);
             }
         }
+
+        board = trueBoard;
 
         possMove.removeAll(invalidMove);
 
