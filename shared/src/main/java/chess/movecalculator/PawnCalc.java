@@ -32,6 +32,7 @@ public class PawnCalc implements MoveCalc {
     }
 
     @Override public List<ChessMove> getPieceMoves() {
+        if(newRow < BOARD_MIN || newRow > BOARD_MAX){return possMove;}
 
         for (int i = -1; i < 2; i++) {
             int newCol = startCol + i;
