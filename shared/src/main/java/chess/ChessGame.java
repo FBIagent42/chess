@@ -165,69 +165,40 @@ public class ChessGame {
      * @return True if the specified team is in check
      */
     public boolean isInCheck(TeamColor teamColor) {
-        ChessPosition king = findKing(teamColor);
+        return isAttacked(teamColor, findKing(teamColor));
+    }
 
+    public boolean isAttacked (TeamColor teamColor,ChessPosition attackedPos){
+        ChessPiece piece = board.getPiece(attackedPos);
+        boolean addedKing = false;
+        if(piece == null){
+            board.addPiece(attackedPos, new ChessPiece(teamColor, ChessPiece.PieceType.KING));
+            addedKing = true;
+        }
 
-        List<ChessMove> knightCheck = new ArrayList<>();
-        knightCheck.addAll(new KnightCalc(board, king).getPieceMoves());
+        for(ChessPiece.PieceType attackPiece: ChessPiece.PieceType.values()){
+            List<ChessMove> possAttack = new ArrayList<>();
+            switch (attackPiece){
+                case KING -> possAttack.addAll(new KingCalc(board, attackedPos).getPieceMoves());
+                case QUEEN -> possAttack.addAll(new QueenCalc(board, attackedPos).getPieceMoves());
+                case ROOK -> possAttack.addAll(new RookCalc(board, attackedPos).getPieceMoves());
+                case BISHOP -> possAttack.addAll(new BishopCalc(board, attackedPos).getPieceMoves());
+                case KNIGHT -> possAttack.addAll(new KnightCalc(board, attackedPos).getPieceMoves());
+                case PAWN -> possAttack.addAll(new PawnCalc(board, attackedPos).getPieceMoves());
+            }
 
-        for(ChessMove move: knightCheck){
-            ChessPiece selectPiece = board.getPiece(move.getEndPosition());
-            if(selectPiece != null
-                    && selectPiece.getTeamColor() != teamColor
-                    && selectPiece.getPieceType() == ChessPiece.PieceType.KNIGHT){
-                return true;
+            for(ChessMove move: possAttack){
+                ChessPiece selectPiece = board.getPiece(move.getEndPosition());
+                if(selectPiece != null
+                        && selectPiece.getTeamColor() != teamColor
+                        && selectPiece.getPieceType() == attackPiece){
+                    return true;
+                }
             }
         }
 
-        List<ChessMove> pawnCheck = new ArrayList<>();
-        pawnCheck.addAll(new PawnCalc(board, king).getPieceMoves());
-
-        for(ChessMove move: pawnCheck){
-            ChessPiece selectPiece = board.getPiece(move.getEndPosition());
-            if(selectPiece != null
-                    && selectPiece.getTeamColor() != teamColor
-                    && selectPiece.getPieceType() == ChessPiece.PieceType.PAWN){
-                return true;
-            }
-        }
-
-        List<ChessMove> bishopCheck = new ArrayList<>();
-        bishopCheck.addAll(new BishopCalc(board, king).getPieceMoves());
-
-        for(ChessMove move: bishopCheck){
-            ChessPiece selectPiece = board.getPiece(move.getEndPosition());
-            if(selectPiece != null
-                    && selectPiece.getTeamColor() != teamColor
-                    && (selectPiece.getPieceType() == ChessPiece.PieceType.BISHOP
-                    || selectPiece.getPieceType() == ChessPiece.PieceType.QUEEN)){
-                return true;
-            }
-        }
-
-        List<ChessMove> rookCheck = new ArrayList<>();
-        rookCheck.addAll(new RookCalc(board, king).getPieceMoves());
-
-        for(ChessMove move: rookCheck){
-            ChessPiece selectPiece = board.getPiece(move.getEndPosition());
-            if(selectPiece != null
-                    && selectPiece.getTeamColor() != teamColor
-                    && (selectPiece.getPieceType() == ChessPiece.PieceType.ROOK
-                    || selectPiece.getPieceType() == ChessPiece.PieceType.QUEEN)){
-                return true;
-            }
-        }
-
-        List<ChessMove> kingCheck = new ArrayList<>();
-        kingCheck.addAll(new KingCalc(board, king).getPieceMoves());
-
-        for(ChessMove move: kingCheck){
-            ChessPiece selectPiece = board.getPiece(move.getEndPosition());
-            if(selectPiece != null
-                    && selectPiece.getTeamColor() != teamColor
-                    && selectPiece.getPieceType() == ChessPiece.PieceType.KING){
-                return true;
-            }
+        if(addedKing){
+            board.addPiece(attackedPos, null);
         }
 
         return false;
