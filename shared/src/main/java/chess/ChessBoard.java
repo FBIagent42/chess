@@ -14,6 +14,8 @@ public class ChessBoard {
     private final static int BOARD_MAX = 8;
 
     ChessPiece[][] squares = new ChessPiece[BOARD_MAX][BOARD_MAX];
+    ChessMove lastMove = null;
+
     public ChessBoard() {
         
     }
@@ -25,6 +27,14 @@ public class ChessBoard {
         for(int row = 0; row < 8; row++){
             System.arraycopy(squaresCopy[row], 0, squares[row], 0, 8);
         }
+    }
+
+    public void setLastMove(ChessMove lastMove) {
+        this.lastMove = lastMove;
+    }
+
+    public ChessMove getLastMove() {
+        return lastMove;
     }
 
     public ChessPiece[][] getBoard(){

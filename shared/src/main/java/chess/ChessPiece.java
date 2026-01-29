@@ -76,7 +76,7 @@ public class ChessPiece {
             possMove.addAll(new KnightCalc(board, myPosition).getPieceMoves());
         }
         if (myPiece == PieceType.PAWN){
-            possMove.addAll(new PawnCalc(board, myPosition).getPieceMoves());
+            possMove.addAll(new PawnCalc(board, myPosition, board.getLastMove()).getPieceMoves());
         }
         return possMove;
     }

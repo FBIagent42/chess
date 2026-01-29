@@ -19,6 +19,7 @@ public class ChessGame {
     TeamColor turn;
     int[] whiteKing;
     int[] blackKing;
+
     public ChessGame() {
         turn = TeamColor.WHITE;
         board.resetBoard();
@@ -101,6 +102,9 @@ public class ChessGame {
     public void makeMove(ChessMove move) throws InvalidMoveException {
         ChessPosition startPosition = move.getStartPosition();
         ChessPiece piece = board.getPiece(startPosition);
+        ChessPosition endPosition = move.getEndPosition();
+        int startCol = startPosition.getColumn();
+
         if(piece == null){
             throw new InvalidMoveException("No piece at that position");
         }
@@ -119,11 +123,22 @@ public class ChessGame {
         }
 
         if(move.getPromotionPiece() == null){
+            if(piece.getPieceType() == ChessPiece.PieceType.PAWN
+                    && board.getPiece(endPosition) == null
+                    && endPosition.getColumn() != startCol){
+                ChessPosition pawnPos = new ChessPosition(startPosition.getRow(), endPosition.getColumn());
+                board.addPiece(pawnPos, null);
+            } else{
+                board.addPiece(startPosition, null);
+            }
+            board.addPiece(endPosition, piece);
             board.addPiece(move.getEndPosition(), piece);
         } else{
             board.addPiece(move.getEndPosition(), new ChessPiece(piece.getTeamColor(), move.getPromotionPiece()));
         }
         board.addPiece(startPosition, null);
+
+        board.setLastMove(move);
 
         if(piece.getPieceType() == ChessPiece.PieceType.KING){
             if(piece.getTeamColor() == TeamColor.WHITE){

@@ -40,12 +40,17 @@ public class PawnCalc implements MoveCalc {
     @Override public List<ChessMove> getPieceMoves() {
         if(newRow < BOARD_MIN || newRow > BOARD_MAX){return possMove;}
 
+        int wayPassant = canPassant();
+
         for (int i = -1; i < 2; i++) {
             int newCol = startCol + i;
             if (newCol < BOARD_MIN || newCol > BOARD_MAX) {
                 continue;
             }
             ChessPosition newMove = new ChessPosition(newRow, newCol);
+            if(i == wayPassant){
+                possMove.add(new ChessMove(myPosition, newMove, null));
+            }
             moveOccupied(possMove, board, myPosition, newMove);
         }
 
@@ -59,12 +64,15 @@ public class PawnCalc implements MoveCalc {
     }
 
     private int canPassant(){
+        if(lastMove == null){return 2;}
         ChessPiece.PieceType lastPiece =  board.getPiece(lastMove.getEndPosition()).getPieceType();
         int startRow = newRow - direction;
         int lastMoveCol = lastMove.getEndPosition().getColumn();
         int lastMoveRow = lastMove.getEndPosition().getRow();
+        int lastMoveStartRow = lastMove.getStartPosition().getRow();
 
-        if(lastPiece == ChessPiece.PieceType.PAWN && lastMoveRow == startRow){
+
+        if(lastPiece == ChessPiece.PieceType.PAWN && lastMoveRow == startRow && lastMoveStartRow == startRow + (2*direction)){
             if(lastMoveCol == startCol + 1){
                 return 1;
             }else if(lastMoveCol == startCol - 1){
@@ -72,7 +80,7 @@ public class PawnCalc implements MoveCalc {
             }
         }
 
-        return 0;
+        return 2;
     }
 
     @Override
