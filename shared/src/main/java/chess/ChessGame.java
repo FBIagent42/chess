@@ -108,7 +108,6 @@ public class ChessGame {
         int startCol = startPosition.getColumn();
         int startRow = startPosition.getRow();
         int endCol = endPosition.getColumn();
-        int endRow = endPosition.getRow();
 
         if(piece == null){
             throw new InvalidMoveException("No piece at that position");
@@ -275,11 +274,9 @@ public class ChessGame {
         for(int row = 1; row <= 8; row++){
             for(int col = 1; col <= 8; col++){
                 ChessPiece piece = board.getPiece(new ChessPosition(row, col));
-                if(piece == null){
-                    continue;
-                } else if (piece.getPieceType() == ChessPiece.PieceType.KING && piece.getTeamColor() == TeamColor.WHITE) {
+                if (piece != null && piece.getPieceType() == ChessPiece.PieceType.KING && piece.getTeamColor() == TeamColor.WHITE) {
                     whiteKing = new int[] {row, col};
-                } else if (piece.getPieceType() == ChessPiece.PieceType.KING && piece.getTeamColor() == TeamColor.BLACK) {
+                } else if (piece != null && piece.getPieceType() == ChessPiece.PieceType.KING && piece.getTeamColor() == TeamColor.BLACK) {
                     blackKing = new int[] {row, col};
                 }
             }
