@@ -20,10 +20,10 @@ public class ChessBoard {
     ChessPiece[][] squares = new ChessPiece[BOARD_MAX][BOARD_MAX];
     ChessMove lastMove = null;
 
-    boolean WHITE_QUEENSIDE_CASTLE = true;
-    boolean WHITE_KINGSIDE_CASTLE = true;
-    boolean BLACK_QUEENSIDE_CASTLE = true;
-    boolean BLACK_KINGSIDE_CASTLE = true;
+    boolean whiteQueensideCastle = true;
+    boolean whiteKingsideCastle = true;
+    boolean blackQueensideCastle = true;
+    boolean blackKingsideCastle = true;
 
 
     public ChessBoard() {
@@ -41,30 +41,33 @@ public class ChessBoard {
         if(copy.getLastMove() == null){
             this.lastMove = null;
         }else{
-            this.lastMove = new ChessMove(copy.getLastMove().getStartPosition(), copy.getLastMove().getEndPosition(), copy.getLastMove().getPromotionPiece());
+            ChessPosition lastStart = copy.getLastMove().getStartPosition();
+            ChessPosition lastEnd = copy.getLastMove().getEndPosition();
+            ChessPiece.PieceType lastPromote =  copy.getLastMove().getPromotionPiece();
+            this.lastMove = new ChessMove(lastStart, lastEnd, lastPromote);
 
         }
 
-        WHITE_QUEENSIDE_CASTLE = copy.WHITE_QUEENSIDE_CASTLE;
-        WHITE_KINGSIDE_CASTLE = copy.BLACK_KINGSIDE_CASTLE;
-        BLACK_QUEENSIDE_CASTLE = copy.BLACK_QUEENSIDE_CASTLE;
-        BLACK_KINGSIDE_CASTLE = copy.BLACK_KINGSIDE_CASTLE;
+        whiteQueensideCastle = copy.whiteQueensideCastle;
+        whiteKingsideCastle = copy.blackKingsideCastle;
+        blackQueensideCastle = copy.blackQueensideCastle;
+        blackKingsideCastle = copy.blackKingsideCastle;
     }
 
-    public void setBLACK_KINGSIDE_CASTLE(boolean BLACK_KINGSIDE_CASTLE) {
-        this.BLACK_KINGSIDE_CASTLE = BLACK_KINGSIDE_CASTLE;
+    public void setBlackKingsideCastle(boolean blackKingsideCastle) {
+        this.blackKingsideCastle = blackKingsideCastle;
     }
 
-    public void setBLACK_QUEENSIDE_CASTLE(boolean BLACK_QUEENSIDE_CASTLE) {
-        this.BLACK_QUEENSIDE_CASTLE = BLACK_QUEENSIDE_CASTLE;
+    public void setBlackQueensideCastle(boolean blackQueensideCastle) {
+        this.blackQueensideCastle = blackQueensideCastle;
     }
 
-    public void setWHITE_KINGSIDE_CASTLE(boolean WHITE_KINGSIDE_CASTLE) {
-        this.WHITE_KINGSIDE_CASTLE = WHITE_KINGSIDE_CASTLE;
+    public void setWhiteKingsideCastle(boolean whiteKingsideCastle) {
+        this.whiteKingsideCastle = whiteKingsideCastle;
     }
 
-    public void setWHITE_QUEENSIDE_CASTLE(boolean WHITE_QUEENSIDE_CASTLE) {
-        this.WHITE_QUEENSIDE_CASTLE = WHITE_QUEENSIDE_CASTLE;
+    public void setWhiteQueensideCastle(boolean whiteQueensideCastle) {
+        this.whiteQueensideCastle = whiteQueensideCastle;
     }
 
     public void setLastMove(ChessMove lastMove) {

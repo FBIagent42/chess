@@ -1,7 +1,5 @@
 package chess;
 
-import chess.movecalculator.*;
-
 import java.util.ArrayList;
 import java.util.Collection;
 import java.util.List;
@@ -167,19 +165,19 @@ public class ChessGame {
 
         ChessPosition start = move.getStartPosition();
         if (new ChessPosition(1, 1).equals(start)) {
-            board.setWHITE_QUEENSIDE_CASTLE(false);
+            board.setWhiteQueensideCastle(false);
         } else if (new ChessPosition(1,5).equals(start)) {
-            board.setWHITE_QUEENSIDE_CASTLE(false);
-            board.setWHITE_KINGSIDE_CASTLE(false);
+            board.setWhiteQueensideCastle(false);
+            board.setWhiteKingsideCastle(false);
         } else if (new ChessPosition(1,8).equals(start)) {
-            board.setWHITE_KINGSIDE_CASTLE(false);
+            board.setWhiteKingsideCastle(false);
         } else if (new ChessPosition(8,1).equals(start)) {
-            board.setBLACK_QUEENSIDE_CASTLE(false);
+            board.setBlackQueensideCastle(false);
         } else if (new ChessPosition(8,5).equals(start)) {
-            board.setBLACK_QUEENSIDE_CASTLE(false);
-            board.setBLACK_KINGSIDE_CASTLE(false);
+            board.setBlackQueensideCastle(false);
+            board.setBlackKingsideCastle(false);
         } else if (new ChessPosition(8,8).equals(start)) {
-            board.setBLACK_QUEENSIDE_CASTLE(false);
+            board.setBlackQueensideCastle(false);
         }
 
     }
@@ -296,9 +294,9 @@ public class ChessGame {
         TeamColor color = piece.getTeamColor();
         int row = myPosition.getRow();
 
-        if(color == TeamColor.WHITE && !(board.WHITE_KINGSIDE_CASTLE || board.BLACK_QUEENSIDE_CASTLE)){
+        if(color == TeamColor.WHITE && !(board.whiteKingsideCastle || board.blackQueensideCastle)){
             return;
-        }else if (color == TeamColor.BLACK && !(board.BLACK_KINGSIDE_CASTLE || board.BLACK_QUEENSIDE_CASTLE)){
+        }else if (color == TeamColor.BLACK && !(board.blackKingsideCastle || board.blackQueensideCastle)){
             return;
         } else if (isInCheck(color)) {
             return;
@@ -314,17 +312,17 @@ public class ChessGame {
             checkPos = new ChessPosition(row, col);
 
             if(board.getPiece(checkPos) != null && color == TeamColor.WHITE){
-                board.setWHITE_QUEENSIDE_CASTLE(false);
+                board.setWhiteQueensideCastle(false);
                 break;
             }else if(board.getPiece(checkPos) != null && color == TeamColor.BLACK){
-                board.setBLACK_QUEENSIDE_CASTLE(false);
+                board.setBlackQueensideCastle(false);
                 break;
             }
             if(board.isAttacked(piece.getTeamColor(), checkPos) && color == TeamColor.WHITE){
-                board.setWHITE_QUEENSIDE_CASTLE(false);
+                board.setWhiteQueensideCastle(false);
                 break;
             } else if (board.isAttacked(piece.getTeamColor(), checkPos) && color == TeamColor.BLACK) {
-                board.setBLACK_QUEENSIDE_CASTLE(false);
+                board.setBlackQueensideCastle(false);
                 break;
             }
         }
@@ -332,31 +330,31 @@ public class ChessGame {
             checkPos = new ChessPosition(row, col);
 
             if(board.getPiece(checkPos) != null && color == TeamColor.WHITE){
-                board.setWHITE_KINGSIDE_CASTLE(false);
+                board.setWhiteKingsideCastle(false);
                 break;
             }else if(board.getPiece(checkPos) != null && color == TeamColor.BLACK){
-                board.setBLACK_KINGSIDE_CASTLE(false);
+                board.setBlackKingsideCastle(false);
                 break;
             }
             if(board.isAttacked(piece.getTeamColor(), checkPos) && color == TeamColor.WHITE){
-                board.setWHITE_KINGSIDE_CASTLE(false);
+                board.setWhiteKingsideCastle(false);
                 break;
             } else if (board.isAttacked(piece.getTeamColor(), checkPos) && color == TeamColor.BLACK) {
-                board.setBLACK_KINGSIDE_CASTLE(false);
+                board.setBlackKingsideCastle(false);
                 break;
             }
         }
 
-        if(board.WHITE_QUEENSIDE_CASTLE && color == TeamColor.WHITE){
+        if(board.whiteQueensideCastle && color == TeamColor.WHITE){
             possMove.add(new ChessMove(myPosition, new ChessPosition(row, myPosition.getColumn() - 2), null));
         }
-        if(board.WHITE_KINGSIDE_CASTLE && color == TeamColor.WHITE){
+        if(board.whiteKingsideCastle && color == TeamColor.WHITE){
             possMove.add(new ChessMove(myPosition, new ChessPosition(row, myPosition.getColumn() + 2), null));
         }
-        if(board.BLACK_QUEENSIDE_CASTLE && color == TeamColor.BLACK){
+        if(board.blackQueensideCastle && color == TeamColor.BLACK){
             possMove.add(new ChessMove(myPosition, new ChessPosition(row, myPosition.getColumn() - 2), null));
         }
-        if(board.BLACK_KINGSIDE_CASTLE && color == TeamColor.BLACK){
+        if(board.blackKingsideCastle && color == TeamColor.BLACK){
             possMove.add(new ChessMove(myPosition, new ChessPosition(row, myPosition.getColumn() + 2), null));
         }
     }
