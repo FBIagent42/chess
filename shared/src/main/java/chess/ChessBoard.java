@@ -1,6 +1,10 @@
 package chess;
 
+import chess.movecalculator.*;
+
+import java.util.ArrayList;
 import java.util.Arrays;
+import java.util.List;
 import java.util.Objects;
 
 /**
@@ -16,6 +20,12 @@ public class ChessBoard {
     ChessPiece[][] squares = new ChessPiece[BOARD_MAX][BOARD_MAX];
     ChessMove lastMove = null;
 
+    boolean WHITE_QUEENSIDE_CASTLE = true;
+    boolean WHITE_KINGSIDE_CASTLE = true;
+    boolean BLACK_QUEENSIDE_CASTLE = true;
+    boolean BLACK_KINGSIDE_CASTLE = true;
+
+
     public ChessBoard() {
         
     }
@@ -27,6 +37,34 @@ public class ChessBoard {
         for(int row = 0; row < 8; row++){
             System.arraycopy(squaresCopy[row], 0, squares[row], 0, 8);
         }
+
+        if(copy.getLastMove() == null){
+            this.lastMove = null;
+        }else{
+            this.lastMove = new ChessMove(copy.getLastMove().getStartPosition(), copy.getLastMove().getEndPosition(), copy.getLastMove().getPromotionPiece());
+
+        }
+
+        WHITE_QUEENSIDE_CASTLE = copy.WHITE_QUEENSIDE_CASTLE;
+        WHITE_KINGSIDE_CASTLE = copy.BLACK_KINGSIDE_CASTLE;
+        BLACK_QUEENSIDE_CASTLE = copy.BLACK_QUEENSIDE_CASTLE;
+        BLACK_KINGSIDE_CASTLE = copy.BLACK_KINGSIDE_CASTLE;
+    }
+
+    public void setBLACK_KINGSIDE_CASTLE(boolean BLACK_KINGSIDE_CASTLE) {
+        this.BLACK_KINGSIDE_CASTLE = BLACK_KINGSIDE_CASTLE;
+    }
+
+    public void setBLACK_QUEENSIDE_CASTLE(boolean BLACK_QUEENSIDE_CASTLE) {
+        this.BLACK_QUEENSIDE_CASTLE = BLACK_QUEENSIDE_CASTLE;
+    }
+
+    public void setWHITE_KINGSIDE_CASTLE(boolean WHITE_KINGSIDE_CASTLE) {
+        this.WHITE_KINGSIDE_CASTLE = WHITE_KINGSIDE_CASTLE;
+    }
+
+    public void setWHITE_QUEENSIDE_CASTLE(boolean WHITE_QUEENSIDE_CASTLE) {
+        this.WHITE_QUEENSIDE_CASTLE = WHITE_QUEENSIDE_CASTLE;
     }
 
     public void setLastMove(ChessMove lastMove) {
@@ -40,6 +78,7 @@ public class ChessBoard {
     public ChessPiece[][] getBoard(){
         return squares;
     }
+
 
     /**
      * Adds a chess piece to the chessboard
@@ -62,6 +101,42 @@ public class ChessBoard {
     public ChessPiece getPiece(ChessPosition position) {
 
         return squares[position.getRow() - 1][position.getColumn() - 1];
+    }
+
+    public boolean isAttacked (ChessGame.TeamColor teamColor, ChessPosition attackedPos){
+        ChessPiece piece = getPiece(attackedPos);
+        boolean addedKing = false;
+        if(piece == null){
+            addPiece(attackedPos, new ChessPiece(teamColor, ChessPiece.PieceType.KING));
+            addedKing = true;
+        }
+
+        for(ChessPiece.PieceType attackPiece: ChessPiece.PieceType.values()){
+            List<ChessMove> possAttack = new ArrayList<>();
+            switch (attackPiece){
+                case KING -> possAttack.addAll(new KingCalc(this, attackedPos).getPieceMoves());
+                case QUEEN -> possAttack.addAll(new QueenCalc(this, attackedPos).getPieceMoves());
+                case ROOK -> possAttack.addAll(new RookCalc(this, attackedPos).getPieceMoves());
+                case BISHOP -> possAttack.addAll(new BishopCalc(this, attackedPos).getPieceMoves());
+                case KNIGHT -> possAttack.addAll(new KnightCalc(this, attackedPos).getPieceMoves());
+                case PAWN -> possAttack.addAll(new PawnCalc(this, attackedPos).getPieceMoves());
+            }
+
+            for(ChessMove move: possAttack){
+                ChessPiece selectPiece = getPiece(move.getEndPosition());
+                if(selectPiece != null
+                        && selectPiece.getTeamColor() != teamColor
+                        && selectPiece.getPieceType() == attackPiece){
+                    return true;
+                }
+            }
+        }
+
+        if(addedKing){
+            addPiece(attackedPos, null);
+        }
+
+        return false;
     }
 
     /**

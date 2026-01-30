@@ -1,8 +1,6 @@
 package chess.movecalculator;
 
-import chess.ChessBoard;
-import chess.ChessMove;
-import chess.ChessPosition;
+import chess.*;
 
 import java.util.ArrayList;
 import java.util.List;
@@ -19,6 +17,7 @@ public class KingCalc implements MoveCalc{
 
     @Override public List<ChessMove> getPieceMoves(){
         List<ChessMove> possMove = new ArrayList<>();
+
         possMove.addAll(diagonalMove(board, myPosition, true));
         possMove.addAll(orthogonalMove(board, myPosition, true));
 
