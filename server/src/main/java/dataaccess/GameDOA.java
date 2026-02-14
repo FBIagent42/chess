@@ -7,8 +7,8 @@ import java.util.Collection;
 public interface GameDOA {
 
     void createGame(GameData game);
-    GameData getGame(String gameID);
+    GameData getGame(int gameID);
     Collection<GameData> listGames();
     void updateGame(GameData game);
-    void deleteGame(String gameID);
+    void deleteGame(int gameID);
 }
