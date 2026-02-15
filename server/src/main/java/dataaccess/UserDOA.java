@@ -8,4 +8,5 @@ public interface UserDOA {
     UserData getUser(String username);
     void updateUser(UserData user);
     void deleteUser(UserData user);
+    void clear();
 }

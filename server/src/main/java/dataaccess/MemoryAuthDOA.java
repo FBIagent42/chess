@@ -21,4 +21,9 @@ public class MemoryAuthDOA implements AuthDOA{
     public void deleteAuth(String authToken) {
         db.remove(authToken);
     }
+
+    @Override
+    public void clear() {
+        db.clear();
+    }
 }

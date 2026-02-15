@@ -26,4 +26,9 @@ public class MemoryUserDOA implements UserDOA{
     public void deleteUser(UserData user) {
         db.remove(user.username());
     }
+
+    @Override
+    public void clear() {
+        db.clear();
+    }
 }

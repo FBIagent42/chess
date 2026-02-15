@@ -30,4 +30,9 @@ public class MemoryGameDOA implements GameDOA{
     public void deleteGame(int gameID) {
         db.remove(gameID);
     }
+
+    @Override
+    public void clear() {
+        db.clear();
+    }
 }

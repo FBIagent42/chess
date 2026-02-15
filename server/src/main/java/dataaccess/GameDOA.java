@@ -11,4 +11,5 @@ public interface GameDOA {
     Collection<GameData> listGames();
     void updateGame(GameData game);
     void deleteGame(int gameID);
+    void clear();
 }
