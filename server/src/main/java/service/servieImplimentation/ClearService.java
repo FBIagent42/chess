@@ -1,6 +1,6 @@
-package service;
+package service.servieImplimentation;
 
-public class ClearService implements Service{
+public class ClearService implements Service {
 
     public void clear(){
         gameDoa.clear();

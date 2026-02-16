@@ -1,21 +1,23 @@
-package service;
+package service.servieImplimentation;
 
 import chess.ChessGame;
 import model.GameData;
 import service.requests.CreateGameRequest;
 import service.requests.JoinGameRequest;
-
-import java.util.Collection;
+import service.requests.ListGamesRequest;
+import service.resulsts.CreateGameResult;
+import service.resulsts.ListGamesResult;
+import service.serviceExceptions.*;
 
 public class GameService implements Service{
 
     private static int nextGameID = 0;
 
-    public Collection<GameData> listGames(String authToken){
-        varifyAuth(authToken);
-        return gameDoa.listGames();
+    public ListGamesResult listGames(ListGamesRequest listGamesRequest){
+        varifyAuth(listGamesRequest.authToken());
+        return new ListGamesResult(gameDoa.listGames());
     }
-    public int createGame(CreateGameRequest createGameRequest){
+    public CreateGameResult createGame(CreateGameRequest createGameRequest){
         String name = createGameRequest.gameName();
 
         varifyAuth(createGameRequest.authToken());
@@ -24,7 +26,7 @@ public class GameService implements Service{
         nextGameID++;
         gameDoa.createGame(game);
 
-        return nextGameID--;
+        return new CreateGameResult(nextGameID--);
     }
     public void joinGame(JoinGameRequest joinGameRequest){
         String color = joinGameRequest.playerColor();
@@ -35,11 +37,11 @@ public class GameService implements Service{
         GameData game = gameDoa.getGame(joinGameRequest.gameID());
 
         if(game == null){
-            //throw(NoGameException());
+            throw(new NoGameException());
         }
         if((color.equals("BLACK") && game.blackUsername() != null)
                 || (color.equals("WHITE") && game.whiteUsername() != null)){
-            //throw(ColorTakenException());
+            throw(new ColorTakenException());
         }
 
         if(color.equals("WHITE")){

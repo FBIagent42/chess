@@ -1,8 +1,9 @@
-package service;
+package service.servieImplimentation;
 
 import dataaccess.MemoryAuthDOA;
 import dataaccess.MemoryGameDOA;
 import dataaccess.MemoryUserDOA;
+import service.serviceExceptions.UnauthorizedException;
 
 import java.util.UUID;
 
@@ -17,7 +18,7 @@ public interface Service {
 
     default void varifyAuth(String authToken){
         if(authDOA.getAuth(authToken) == null){
-            //throw(UnauthorizedException());
+            throw(new UnauthorizedException());
         }
     }
 }

@@ -1,4 +1,4 @@
-package service;
+package service.servieImplimentation;
 
 import model.AuthData;
 import model.UserData;
@@ -7,6 +7,7 @@ import service.requests.LogoutRequest;
 import service.requests.RegisterRequest;
 import service.resulsts.LoginResult;
 import service.resulsts.RegisterResult;
+import service.serviceExceptions.*;
 
 public class UserService implements Service{
 
@@ -14,7 +15,7 @@ public class UserService implements Service{
         String username = registerRequest.username();
         UserData user =  userDOA.getUser(username);
         if(user != null){
-            //throw(AlreadyTakenException());
+            throw(new AlreadyTakenException());
         }
 
         userDOA.createUser(new UserData(username, registerRequest.password(), registerRequest.email()));
@@ -27,10 +28,10 @@ public class UserService implements Service{
         String username = loginRequest.username();
         UserData user =  userDOA.getUser(username);
         if(user == null){
-            //throw(UserNotFoundException());
+            throw(new UserNotFoundException());
         }
         if(!user.password().equals(loginRequest.password())){
-            //throw(UnauthorizedException);
+            throw(new UnauthorizedException());
         }
 
         String authToken = generateToken();
