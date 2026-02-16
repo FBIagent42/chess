@@ -1,7 +1,5 @@
 package service;
 
-import dataaccess.MemoryAuthDOA;
-import dataaccess.MemoryUserDOA;
 import model.AuthData;
 import model.UserData;
 import service.requests.LoginRequest;
@@ -11,8 +9,6 @@ import service.resulsts.LoginResult;
 import service.resulsts.RegisterResult;
 
 public class UserService implements Service{
-    private final MemoryUserDOA userDOA = new MemoryUserDOA();
-    private final MemoryAuthDOA authDOA = new MemoryAuthDOA();
 
     public RegisterResult register(RegisterRequest registerRequest) {
         String username = registerRequest.username();
@@ -27,14 +23,13 @@ public class UserService implements Service{
 
         return new RegisterResult(username, authToken);
     }
-
     public LoginResult login(LoginRequest loginRequest) {
         String username = loginRequest.username();
         UserData user =  userDOA.getUser(username);
         if(user == null){
             //throw(UserNotFoundException());
         }
-        if(user.password() != loginRequest.password()){
+        if(!user.password().equals(loginRequest.password())){
             //throw(UnauthorizedException);
         }
 
@@ -45,9 +40,7 @@ public class UserService implements Service{
     }
     public void logout(LogoutRequest logoutRequest) {
         String authToken = logoutRequest.authToken();
-        if(authDOA.getAuth(authToken) == null){
-            //throw(UnauthorizedException());
-        }
+        varifyAuth(authToken);
 
         authDOA.deleteAuth(authToken);
     }
