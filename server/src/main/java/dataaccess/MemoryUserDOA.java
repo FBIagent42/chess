@@ -5,7 +5,8 @@ import java.util.HashMap;
 import java.util.Map;
 
 public class MemoryUserDOA implements UserDOA{
-    private static final Map<String, UserData> db = new HashMap<>();
+    private static final Map<String, UserData> db = new HashMap<>(Map.of("Corbin",
+            new UserData("Corbin", "1234", "Test@gmail.com")));
 
     @Override
     public void createUser(UserData user) {

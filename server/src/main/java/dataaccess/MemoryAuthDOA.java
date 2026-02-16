@@ -5,7 +5,9 @@ import java.util.HashMap;
 import java.util.Map;
 
 public class MemoryAuthDOA implements AuthDOA{
-    private static final Map<String, AuthData> db = new HashMap<>();
+    private static final Map<String, AuthData> db = new HashMap<>(Map.of("Test",
+            new AuthData("Test", "Corbin")));
+
 
     @Override
     public void createAuth(AuthData auth) {
