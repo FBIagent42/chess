@@ -1,12 +1,10 @@
 package dataaccess;
 
-import chess.ChessGame;
 import model.GameData;
 import java.util.*;
 
 public class MemoryGameDOA implements GameDOA{
-    private static final Map<Integer, GameData> db = new HashMap<>(Map.of(1234,
-            new GameData(1234, "Corbin", "Bill", "Test", new ChessGame())));
+    private static final Map<Integer, GameData> db = new HashMap<>();
 
     @Override
     public void createGame(GameData game) {

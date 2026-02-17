@@ -1,5 +1,6 @@
 package service;
 
+import chess.ChessGame;
 import model.AuthData;
 import model.GameData;
 import model.UserData;
@@ -10,6 +11,10 @@ public class ClearServiceTest implements BaseTests{
 
     @Test
     public void positiveClear(){
+        addAuth("Test", "Test");
+        addUser("Corbin", "Test", "Test");
+        addGame(1234, "Test", new ChessGame());
+
         clearService.clear();
 
         AuthData authData = authDOA.getAuth("Test");

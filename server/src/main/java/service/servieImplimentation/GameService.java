@@ -11,7 +11,7 @@ import service.serviceExceptions.*;
 
 public class GameService implements Service{
 
-    private static int nextGameID = 0;
+    private static int nextGameID = 1;
 
     public ListGamesResult listGames(ListGamesRequest listGamesRequest){
         varifyAuth(listGamesRequest.authToken());
@@ -26,13 +26,13 @@ public class GameService implements Service{
         nextGameID++;
         gameDoa.createGame(game);
 
-        return new CreateGameResult(nextGameID--);
+        return new CreateGameResult(nextGameID - 1);
     }
     public void joinGame(JoinGameRequest joinGameRequest){
+        varifyAuth(joinGameRequest.authToken());
+
         String color = joinGameRequest.playerColor();
         String username = authDOA.getAuth(joinGameRequest.authToken()).username();
-
-        varifyAuth(joinGameRequest.authToken());
 
         GameData game = gameDoa.getGame(joinGameRequest.gameID());
 

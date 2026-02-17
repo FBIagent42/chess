@@ -5,13 +5,12 @@ import java.util.HashMap;
 import java.util.Map;
 
 public class MemoryAuthDOA implements AuthDOA{
-    private static final Map<String, AuthData> db = new HashMap<>(Map.of("Test",
-            new AuthData("Test", "Corbin")));
+    private static final Map<String, AuthData> db = new HashMap<>();
 
 
     @Override
     public void createAuth(AuthData auth) {
-        db.put(auth.username(), auth);
+        db.put(auth.authToken(), auth);
     }
 
     @Override
