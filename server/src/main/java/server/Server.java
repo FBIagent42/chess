@@ -13,6 +13,7 @@ public class Server {
                 .post("/session", new LoginHandler())
                 .delete("/session", new LogoutHandler())
                 .get("/game", new ListGamesHandler())
+                .post("/game", new CreateGameHandler())
                 .delete("/db", new ClearHandler());
 
         // Register your endpoints and exception handlers here.
