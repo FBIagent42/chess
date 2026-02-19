@@ -14,6 +14,7 @@ public class Server {
                 .delete("/session", new LogoutHandler())
                 .get("/game", new ListGamesHandler())
                 .post("/game", new CreateGameHandler())
+                .put("/game", new JoinGameHandler())
                 .delete("/db", new ClearHandler());
 
         // Register your endpoints and exception handlers here.
