@@ -15,7 +15,7 @@ public class GameService implements Service{
 
     public ListGamesResult listGames(ListGamesRequest listGamesRequest){
         varifyAuth(listGamesRequest.authToken());
-        return new ListGamesResult(gameDoa.listGames());
+        return new ListGamesResult(gameDAO.listGames());
     }
     public CreateGameResult createGame(CreateGameRequest createGameRequest){
         String name = createGameRequest.gameName();
@@ -24,7 +24,7 @@ public class GameService implements Service{
 
         GameData game = new GameData(nextGameID, null, null, name, new ChessGame());
         nextGameID++;
-        gameDoa.createGame(game);
+        gameDAO.createGame(game);
 
         return new CreateGameResult(nextGameID - 1);
     }
@@ -32,9 +32,9 @@ public class GameService implements Service{
         varifyAuth(joinGameRequest.authToken());
 
         String color = joinGameRequest.playerColor();
-        String username = authDOA.getAuth(joinGameRequest.authToken()).username();
+        String username = authDAO.getAuth(joinGameRequest.authToken()).username();
 
-        GameData game = gameDoa.getGame(joinGameRequest.gameID());
+        GameData game = gameDAO.getGame(joinGameRequest.gameID());
 
         if(game == null){
             throw(new NoGameException());
@@ -45,14 +45,14 @@ public class GameService implements Service{
         }
 
         if(color.equals("WHITE")){
-            gameDoa.updateGame(new GameData(game.gameID(),
+            gameDAO.updateGame(new GameData(game.gameID(),
                     username,
                     game.blackUsername(),
                     game.gameName(),
                     game.game()));
         }
         if(color.equals("BLACK")){
-            gameDoa.updateGame(new GameData(game.gameID(),
+            gameDAO.updateGame(new GameData(game.gameID(),
                     game.whiteUsername(),
                     username,
                     game.gameName(),

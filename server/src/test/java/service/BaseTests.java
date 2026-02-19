@@ -13,9 +13,9 @@ public interface BaseTests {
     UserService userService = new UserService();
     GameService gameService = new GameService();
     ClearService clearService = new ClearService();
-    UserDOA userDOA = new MemoryUserDOA();
-    GameDOA gameDOA = new MemoryGameDOA();
-    AuthDOA authDOA = new MemoryAuthDOA();
+    UserDAO userDOA = new MemoryUserDAO();
+    GameDAO gameDOA = new MemoryGameDAO();
+    AuthDAO authDOA = new MemoryAuthDAO();
 
     default void addAuth(String authToken, String username){
         authDOA.createAuth(new AuthData(authToken, username));

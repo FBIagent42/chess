@@ -3,7 +3,7 @@ package dataaccess;
 import model.GameData;
 import java.util.*;
 
-public class MemoryGameDOA implements GameDOA{
+public class MemoryGameDAO implements GameDAO {
     private static final Map<Integer, GameData> db = new HashMap<>();
 
     @Override

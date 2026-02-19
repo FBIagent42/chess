@@ -13,20 +13,20 @@ public class UserService implements Service{
 
     public RegisterResult register(RegisterRequest registerRequest) {
         String username = registerRequest.username();
-        UserData user =  userDOA.getUser(username);
+        UserData user =  userDAO.getUser(username);
         if(user != null){
             throw(new AlreadyTakenException());
         }
 
-        userDOA.createUser(new UserData(username, registerRequest.password(), registerRequest.email()));
+        userDAO.createUser(new UserData(username, registerRequest.password(), registerRequest.email()));
         String authToken = generateToken();
-        authDOA.createAuth(new AuthData(authToken, username));
+        authDAO.createAuth(new AuthData(authToken, username));
 
         return new RegisterResult(username, authToken);
     }
     public LoginResult login(LoginRequest loginRequest) {
         String username = loginRequest.username();
-        UserData user =  userDOA.getUser(username);
+        UserData user =  userDAO.getUser(username);
         if(user == null){
             throw(new UserNotFoundException());
         }
@@ -35,7 +35,7 @@ public class UserService implements Service{
         }
 
         String authToken = generateToken();
-        authDOA.createAuth(new AuthData(authToken, username));
+        authDAO.createAuth(new AuthData(authToken, username));
 
         return new LoginResult(username, authToken);
     }
@@ -43,6 +43,6 @@ public class UserService implements Service{
         String authToken = logoutRequest.authToken();
         varifyAuth(authToken);
 
-        authDOA.deleteAuth(authToken);
+        authDAO.deleteAuth(authToken);
     }
 }

@@ -1,23 +1,23 @@
 package service.servieImplimentation;
 
-import dataaccess.MemoryAuthDOA;
-import dataaccess.MemoryGameDOA;
-import dataaccess.MemoryUserDOA;
+import dataaccess.MemoryAuthDAO;
+import dataaccess.MemoryGameDAO;
+import dataaccess.MemoryUserDAO;
 import service.serviceExceptions.UnauthorizedException;
 
 import java.util.UUID;
 
 public interface Service {
-    MemoryUserDOA userDOA = new MemoryUserDOA();
-    MemoryAuthDOA authDOA = new MemoryAuthDOA();
-    MemoryGameDOA gameDoa = new MemoryGameDOA();
+    MemoryUserDAO userDAO = new MemoryUserDAO();
+    MemoryAuthDAO authDAO = new MemoryAuthDAO();
+    MemoryGameDAO gameDAO = new MemoryGameDAO();
 
     default String generateToken() {
         return UUID.randomUUID().toString();
     }
 
     default void varifyAuth(String authToken){
-        if(authDOA.getAuth(authToken) == null){
+        if(authDAO.getAuth(authToken) == null){
             throw(new UnauthorizedException());
         }
     }
