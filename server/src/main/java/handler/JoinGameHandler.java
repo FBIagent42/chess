@@ -7,6 +7,7 @@ import org.jetbrains.annotations.NotNull;
 import service.requests.JoinGameRequest;
 import service.serviceExceptions.ColorTakenException;
 import service.serviceExceptions.NoGameException;
+import service.serviceExceptions.UnauthorizedException;
 import service.servieImplimentation.GameService;
 
 import java.util.Map;
@@ -18,21 +19,33 @@ public class JoinGameHandler implements Handler {
         var joinGameRequest = new Gson().fromJson(context.body(), JoinGameRequest.class);
         joinGameRequest = new JoinGameRequest(authToken, joinGameRequest.playerColor(), joinGameRequest.gameID());
         String body;
-        int statusCode;
+
+        if(joinGameRequest.playerColor() == null
+                ||!(joinGameRequest.playerColor().equals("WHITE") || joinGameRequest.playerColor().equals("BLACK"))
+                || joinGameRequest.gameID() == 0){
+            body = new Gson().toJson(Map.of("message", "Error: Bad request."));
+            context.status(400)
+                    .json(body);
+            return;
+        }
 
         try{
             new GameService().joinGame(joinGameRequest);
             body = new Gson().toJson(Map.of());
-            statusCode = 200;
+            context.status(200)
+                    .json(body);
         } catch (NoGameException ex){
             body = new Gson().toJson(Map.of("message", "Error: No game with that ID exists."));
-            statusCode = 404;
+            context.status(404)
+                    .json(body);
         } catch (ColorTakenException ex){
             body = new Gson().toJson(Map.of("message", "Error: Color already taken."));
-            statusCode = 403;
+            context.status(403)
+                    .json(body);
+        }  catch (UnauthorizedException ex){
+            body = new Gson().toJson(Map.of("message", "Error: Unauthorized."));
+            context.status(401)
+                    .json(body);
         }
-
-        context.status(statusCode)
-                .json(body);
     }
 }

@@ -19,18 +19,24 @@ public class CreateGameHandler implements Handler {
         createGameRequest = new CreateGameRequest(createGameRequest.gameName(), authToken);
         CreateGameResult createGameResult;
         String body;
-        int statusCode;
+
+        if(createGameRequest.gameName() == null){
+            body = new Gson().toJson(Map.of("message", "Error: Bad request."));
+            context.status(400)
+                    .json(body);
+            return;
+        }
 
         try{
             createGameResult = new GameService().createGame(createGameRequest);
             body = new Gson().toJson(createGameResult);
-            statusCode = 200;
-        } catch (UnauthorizedException ex){
-            body = new Gson().toJson(Map.of("message", "Unauthorized."));
-            statusCode = 401;
-        }
+            context.status(200)
+                    .json(body);
 
-        context.status(statusCode)
-                .json(body);
+        } catch (UnauthorizedException ex){
+            body = new Gson().toJson(Map.of("message", "Error: Unauthorized."));
+            context.status(401)
+                    .json(body);
+        }
     }
 }

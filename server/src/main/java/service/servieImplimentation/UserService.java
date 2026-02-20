@@ -27,10 +27,7 @@ public class UserService implements Service{
     public LoginResult login(LoginRequest loginRequest) {
         String username = loginRequest.username();
         UserData user =  userDAO.getUser(username);
-        if(user == null){
-            throw(new UserNotFoundException());
-        }
-        if(!user.password().equals(loginRequest.password())){
+        if(user == null || !user.password().equals(loginRequest.password())){
             throw(new UnauthorizedException());
         }
 

@@ -17,18 +17,16 @@ public class ListGamesHandler implements Handler{
         var listGamesRequest = new ListGamesRequest(context.header("authorization"));
         ListGamesResult listGamesResult;
         String body;
-        int statusCode;
 
         try{
             listGamesResult = new GameService().listGames(listGamesRequest);
             body = new Gson().toJson(listGamesResult);
-            statusCode = 200;
+            context.status(200)
+                    .json(body);
         } catch (UnauthorizedException ex){
-            body = new Gson().toJson(Map.of("message", "Unauthorized."));
-            statusCode = 401;
+            body = new Gson().toJson(Map.of("message", "Error: Unauthorized."));
+            context.status(401)
+                    .json(body);
         }
-
-        context.status(statusCode)
-                .json(body);
     }
 }

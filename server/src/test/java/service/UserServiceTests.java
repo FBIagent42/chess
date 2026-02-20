@@ -12,7 +12,6 @@ import service.resulsts.LoginResult;
 import service.resulsts.RegisterResult;
 import service.serviceExceptions.AlreadyTakenException;
 import service.serviceExceptions.UnauthorizedException;
-import service.serviceExceptions.UserNotFoundException;
 
 public class UserServiceTests implements BaseTests{
 
@@ -86,7 +85,7 @@ public class UserServiceTests implements BaseTests{
         String password = "1234";
         LoginRequest loginRequest = new LoginRequest(username, password);
 
-        Assertions.assertThrows(UserNotFoundException.class,
+        Assertions.assertThrows(UnauthorizedException.class,
                 () -> userService.login(loginRequest));
     }
 

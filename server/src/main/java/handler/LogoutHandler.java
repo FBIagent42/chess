@@ -15,18 +15,16 @@ public class LogoutHandler implements Handler {
     public void handle(@NotNull Context context){
         var logoutRequest = new LogoutRequest(context.header("authorization"));
         String body;
-        int statusCode;
 
         try{
             new UserService().logout(logoutRequest);
             body = new Gson().toJson(Map.of());
-            statusCode = 200;
+            context.status(200)
+                    .json(body);
         } catch (UnauthorizedException ex){
-            body = new Gson().toJson(Map.of("message", "Unauthorized."));
-            statusCode = 401;
+            body = new Gson().toJson(Map.of("message", "Error: Unauthorized."));
+            context.status(401)
+                    .json(body);
         }
-
-        context.status(statusCode)
-                .json(body);
     }
 }

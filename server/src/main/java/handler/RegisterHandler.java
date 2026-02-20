@@ -17,18 +17,25 @@ public class RegisterHandler implements Handler {
         var registerRequest = new Gson().fromJson(context.body(), RegisterRequest.class);
         RegisterResult registerResult;
         String body;
-        int statusCode;
+
+        if(registerRequest.username() == null
+                || registerRequest.password() == null
+                || registerRequest.email() == null){
+            body = new Gson().toJson(Map.of("message", "Error: Bad request."));
+            context.status(400)
+                    .json(body);
+            return;
+        }
 
         try {
             registerResult = new UserService().register(registerRequest);
             body = new Gson().toJson(registerResult);
-            statusCode = 200;
+            context.status(200)
+                    .json(body);
         } catch (AlreadyTakenException ex) {
             body = new Gson().toJson(Map.of("message", "Error: username already taken."));
-            statusCode = 403;
+            context.status(403)
+                    .json(body);
         }
-
-        context.status(statusCode)
-                .json(body);
     }
 }
