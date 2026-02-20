@@ -10,9 +10,9 @@ import service.requests.JoinGameRequest;
 import service.requests.ListGamesRequest;
 import service.resulsts.CreateGameResult;
 import service.resulsts.ListGamesResult;
-import service.serviceExceptions.ColorTakenException;
-import service.serviceExceptions.NoGameException;
-import service.serviceExceptions.UnauthorizedException;
+import service.serviceexceptions.ColorTakenException;
+import service.serviceexceptions.NoGameException;
+import service.serviceexceptions.UnauthorizedException;
 
 import java.util.Collection;
 import java.util.List;
@@ -21,9 +21,9 @@ public class GameServiceTests implements BaseTests {
 
     @AfterEach
     public void clearAll(){
-        gameDOA.clear();
-        userDOA.clear();
-        authDOA.clear();
+        GAME_DAO.clear();
+        USER_DAO.clear();
+        AUTH_DAO.clear();
     }
 
     @Test
@@ -34,10 +34,10 @@ public class GameServiceTests implements BaseTests {
 
         GameData game1 = new GameData(1, null, null, "test2ElectricBoogalo", new ChessGame());
         GameData game2 = new GameData(1234, "Corbin", "Bill", "Test", new ChessGame());
-        gameDOA.createGame(game1);
-        gameDOA.createGame(game2);
+        GAME_DAO.createGame(game1);
+        GAME_DAO.createGame(game2);
 
-        ListGamesResult listGamesResult = gameService.listGames(listGamesRequest);
+        ListGamesResult listGamesResult = GAME_SERVICE.listGames(listGamesRequest);
 
         Collection<GameData> testGames = List.of(game1, game2);
 
@@ -52,7 +52,7 @@ public class GameServiceTests implements BaseTests {
         ListGamesRequest listGamesRequest = new ListGamesRequest(authToken);
 
         Assertions.assertThrows(UnauthorizedException.class,
-                () -> gameService.listGames(listGamesRequest));
+                () -> GAME_SERVICE.listGames(listGamesRequest));
     }
 
     @Test
@@ -62,9 +62,9 @@ public class GameServiceTests implements BaseTests {
         addAuth(authToken, "Test");
         CreateGameRequest createGameRequest = new CreateGameRequest(gameName, authToken);
 
-        CreateGameResult createGameResult = gameService.createGame(createGameRequest);
+        CreateGameResult createGameResult = GAME_SERVICE.createGame(createGameRequest);
 
-        GameData game = gameDOA.getGame(createGameResult.gameID());
+        GameData game = GAME_DAO.getGame(createGameResult.gameID());
 
         Assertions.assertEquals(game.gameID(), createGameResult.gameID());
         Assertions.assertEquals(gameName, game.gameName());
@@ -78,7 +78,7 @@ public class GameServiceTests implements BaseTests {
         CreateGameRequest createGameRequest = new CreateGameRequest(gameName, authToken);
 
         Assertions.assertThrows(UnauthorizedException.class,
-                () -> gameService.createGame(createGameRequest));
+                () -> GAME_SERVICE.createGame(createGameRequest));
     }
 
     @Test
@@ -92,9 +92,9 @@ public class GameServiceTests implements BaseTests {
 
         JoinGameRequest joinGameRequest = new JoinGameRequest(authToken, color, gameID);
 
-        gameService.joinGame(joinGameRequest);
+        GAME_SERVICE.joinGame(joinGameRequest);
 
-        GameData game = gameDOA.getGame(gameID);
+        GameData game = GAME_DAO.getGame(gameID);
 
         Assertions.assertEquals(name, game.whiteUsername());
     }
@@ -110,9 +110,9 @@ public class GameServiceTests implements BaseTests {
 
         JoinGameRequest joinGameRequest = new JoinGameRequest("Test", color, gameID);
 
-        gameService.joinGame(joinGameRequest);
+        GAME_SERVICE.joinGame(joinGameRequest);
 
-        GameData game = gameDOA.getGame(gameID);
+        GameData game = GAME_DAO.getGame(gameID);
 
         Assertions.assertEquals(name, game.blackUsername());
     }
@@ -128,7 +128,7 @@ public class GameServiceTests implements BaseTests {
         JoinGameRequest joinGameRequest = new JoinGameRequest(authToken, color, gameID);
 
         Assertions.assertThrows(UnauthorizedException.class,
-                () -> gameService.joinGame(joinGameRequest));
+                () -> GAME_SERVICE.joinGame(joinGameRequest));
     }
 
     @Test
@@ -142,7 +142,7 @@ public class GameServiceTests implements BaseTests {
         JoinGameRequest joinGameRequest = new JoinGameRequest(authToken, color, gameID);
 
         Assertions.assertThrows(NoGameException.class,
-                () -> gameService.joinGame(joinGameRequest));
+                () -> GAME_SERVICE.joinGame(joinGameRequest));
     }
 
     @Test
@@ -151,11 +151,11 @@ public class GameServiceTests implements BaseTests {
         int gameID = 1234;
         String authToken = "Test";
         addAuth(authToken, "Test");
-        gameDOA.createGame(new GameData(gameID, "Full", null, "Test", new ChessGame()));
+        GAME_DAO.createGame(new GameData(gameID, "Full", null, "Test", new ChessGame()));
         JoinGameRequest joinGameRequest = new JoinGameRequest(authToken, color, gameID);
 
         Assertions.assertThrows(ColorTakenException.class,
-                () -> gameService.joinGame(joinGameRequest));
+                () -> GAME_SERVICE.joinGame(joinGameRequest));
     }
 
     @Test
@@ -164,11 +164,11 @@ public class GameServiceTests implements BaseTests {
         int gameID = 1234;
         String authToken = "Test";
         addAuth(authToken, "Test");
-        gameDOA.createGame(new GameData(gameID, null, "Full", "Test", new ChessGame()));
+        GAME_DAO.createGame(new GameData(gameID, null, "Full", "Test", new ChessGame()));
         JoinGameRequest joinGameRequest = new JoinGameRequest(authToken, color, gameID);
 
         Assertions.assertThrows(ColorTakenException.class,
-                () -> gameService.joinGame(joinGameRequest));
+                () -> GAME_SERVICE.joinGame(joinGameRequest));
     }
 
 }

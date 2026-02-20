@@ -6,8 +6,8 @@ import io.javalin.http.Handler;
 import org.jetbrains.annotations.NotNull;
 import service.requests.CreateGameRequest;
 import service.resulsts.CreateGameResult;
-import service.serviceExceptions.UnauthorizedException;
-import service.servieImplimentation.GameService;
+import service.serviceexceptions.UnauthorizedException;
+import service.servieimplimentation.GameService;
 
 import java.util.Map;
 

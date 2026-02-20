@@ -6,8 +6,8 @@ import io.javalin.http.Handler;
 import org.jetbrains.annotations.NotNull;
 import service.requests.RegisterRequest;
 import service.resulsts.RegisterResult;
-import service.serviceExceptions.AlreadyTakenException;
-import service.servieImplimentation.UserService;
+import service.serviceexceptions.AlreadyTakenException;
+import service.servieimplimentation.UserService;
 
 import java.util.Map;
 

@@ -5,10 +5,10 @@ import io.javalin.http.Context;
 import io.javalin.http.Handler;
 import org.jetbrains.annotations.NotNull;
 import service.requests.JoinGameRequest;
-import service.serviceExceptions.ColorTakenException;
-import service.serviceExceptions.NoGameException;
-import service.serviceExceptions.UnauthorizedException;
-import service.servieImplimentation.GameService;
+import service.serviceexceptions.ColorTakenException;
+import service.serviceexceptions.NoGameException;
+import service.serviceexceptions.UnauthorizedException;
+import service.servieimplimentation.GameService;
 
 import java.util.Map;
 

@@ -5,28 +5,28 @@ import dataaccess.*;
 import model.AuthData;
 import model.GameData;
 import model.UserData;
-import service.servieImplimentation.ClearService;
-import service.servieImplimentation.GameService;
-import service.servieImplimentation.UserService;
+import service.servieimplimentation.ClearService;
+import service.servieimplimentation.GameService;
+import service.servieimplimentation.UserService;
 
 public interface BaseTests {
-    UserService userService = new UserService();
-    GameService gameService = new GameService();
-    ClearService clearService = new ClearService();
-    UserDAO userDOA = new MemoryUserDAO();
-    GameDAO gameDOA = new MemoryGameDAO();
-    AuthDAO authDOA = new MemoryAuthDAO();
+    UserService USER_SERVICE = new UserService();
+    GameService GAME_SERVICE = new GameService();
+    ClearService CLEAR_SERVICE = new ClearService();
+    UserDAO USER_DAO = new MemoryUserDAO();
+    GameDAO GAME_DAO = new MemoryGameDAO();
+    AuthDAO AUTH_DAO = new MemoryAuthDAO();
 
     default void addAuth(String authToken, String username){
-        authDOA.createAuth(new AuthData(authToken, username));
+        AUTH_DAO.createAuth(new AuthData(authToken, username));
     }
 
     default void addUser(String username, String password, String email){
-        userDOA.createUser(new UserData(username, password, email));
+        USER_DAO.createUser(new UserData(username, password, email));
     }
 
     default void addGame(int gameID, String gameName, ChessGame game){
-        gameDOA.createGame(new GameData(gameID, null, null, gameName, game));
+        GAME_DAO.createGame(new GameData(gameID, null, null, gameName, game));
     }
 
 }

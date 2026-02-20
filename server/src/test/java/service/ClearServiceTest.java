@@ -15,11 +15,11 @@ public class ClearServiceTest implements BaseTests{
         addUser("Corbin", "Test", "Test");
         addGame(1234, "Test", new ChessGame());
 
-        clearService.clear();
+        CLEAR_SERVICE.clear();
 
-        AuthData authData = authDOA.getAuth("Test");
-        GameData gameData = gameDOA.getGame(1234);
-        UserData userData = userDOA.getUser("Corbin");
+        AuthData authData = AUTH_DAO.getAuth("Test");
+        GameData gameData = GAME_DAO.getGame(1234);
+        UserData userData = USER_DAO.getUser("Corbin");
 
         Assertions.assertNull(authData);
         Assertions.assertNull(gameData);

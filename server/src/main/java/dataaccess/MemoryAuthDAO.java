@@ -5,26 +5,26 @@ import java.util.HashMap;
 import java.util.Map;
 
 public class MemoryAuthDAO implements AuthDAO {
-    private static final Map<String, AuthData> db = new HashMap<>();
+    private static final Map<String, AuthData> DB = new HashMap<>();
 
 
     @Override
     public void createAuth(AuthData auth) {
-        db.put(auth.authToken(), auth);
+        DB.put(auth.authToken(), auth);
     }
 
     @Override
     public AuthData getAuth(String authToken) {
-        return db.get(authToken);
+        return DB.get(authToken);
     }
 
     @Override
     public void deleteAuth(String authToken) {
-        db.remove(authToken);
+        DB.remove(authToken);
     }
 
     @Override
     public void clear() {
-        db.clear();
+        DB.clear();
     }
 }

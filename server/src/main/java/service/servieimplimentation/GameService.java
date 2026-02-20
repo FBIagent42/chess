@@ -1,4 +1,4 @@
-package service.servieImplimentation;
+package service.servieimplimentation;
 
 import chess.ChessGame;
 import model.GameData;
@@ -7,7 +7,7 @@ import service.requests.JoinGameRequest;
 import service.requests.ListGamesRequest;
 import service.resulsts.CreateGameResult;
 import service.resulsts.ListGamesResult;
-import service.serviceExceptions.*;
+import service.serviceexceptions.*;
 
 public class GameService implements Service{
 
@@ -15,7 +15,7 @@ public class GameService implements Service{
 
     public ListGamesResult listGames(ListGamesRequest listGamesRequest){
         varifyAuth(listGamesRequest.authToken());
-        return new ListGamesResult(gameDAO.listGames());
+        return new ListGamesResult(GAME_DAO.listGames());
     }
     public CreateGameResult createGame(CreateGameRequest createGameRequest){
         String name = createGameRequest.gameName();
@@ -24,7 +24,7 @@ public class GameService implements Service{
 
         GameData game = new GameData(nextGameID, null, null, name, new ChessGame());
         nextGameID++;
-        gameDAO.createGame(game);
+        GAME_DAO.createGame(game);
 
         return new CreateGameResult(nextGameID - 1);
     }
@@ -32,9 +32,9 @@ public class GameService implements Service{
         varifyAuth(joinGameRequest.authToken());
 
         String color = joinGameRequest.playerColor();
-        String username = authDAO.getAuth(joinGameRequest.authToken()).username();
+        String username = AUTH_DAO.getAuth(joinGameRequest.authToken()).username();
 
-        GameData game = gameDAO.getGame(joinGameRequest.gameID());
+        GameData game = GAME_DAO.getGame(joinGameRequest.gameID());
 
         if(game == null){
             throw(new NoGameException());
@@ -45,14 +45,14 @@ public class GameService implements Service{
         }
 
         if(color.equals("WHITE")){
-            gameDAO.updateGame(new GameData(game.gameID(),
+            GAME_DAO.updateGame(new GameData(game.gameID(),
                     username,
                     game.blackUsername(),
                     game.gameName(),
                     game.game()));
         }
         if(color.equals("BLACK")){
-            gameDAO.updateGame(new GameData(game.gameID(),
+            GAME_DAO.updateGame(new GameData(game.gameID(),
                     game.whiteUsername(),
                     username,
                     game.gameName(),

@@ -6,8 +6,8 @@ import io.javalin.http.Handler;
 import org.jetbrains.annotations.NotNull;
 import service.requests.LoginRequest;
 import service.resulsts.LoginResult;
-import service.serviceExceptions.UnauthorizedException;
-import service.servieImplimentation.UserService;
+import service.serviceexceptions.UnauthorizedException;
+import service.servieimplimentation.UserService;
 
 import java.util.Map;
 

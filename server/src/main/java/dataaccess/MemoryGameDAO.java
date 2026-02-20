@@ -4,35 +4,30 @@ import model.GameData;
 import java.util.*;
 
 public class MemoryGameDAO implements GameDAO {
-    private static final Map<Integer, GameData> db = new HashMap<>();
+    private static final Map<Integer, GameData> DB = new HashMap<>();
 
     @Override
     public void createGame(GameData game) {
-        db.put(game.gameID(), game);
+        DB.put(game.gameID(), game);
     }
 
     @Override
     public GameData getGame(int gameID) {
-        return db.get(gameID);
+        return DB.get(gameID);
     }
 
     @Override
     public Collection<GameData> listGames() {
-        return db.values();
+        return DB.values();
     }
 
     @Override
     public void updateGame(GameData game) {
-        db.replace(game.gameID(), game);
-    }
-
-    @Override
-    public void deleteGame(int gameID) {
-        db.remove(gameID);
+        DB.replace(game.gameID(), game);
     }
 
     @Override
     public void clear() {
-        db.clear();
+        DB.clear();
     }
 }

@@ -10,16 +10,16 @@ import service.requests.LogoutRequest;
 import service.requests.RegisterRequest;
 import service.resulsts.LoginResult;
 import service.resulsts.RegisterResult;
-import service.serviceExceptions.AlreadyTakenException;
-import service.serviceExceptions.UnauthorizedException;
+import service.serviceexceptions.AlreadyTakenException;
+import service.serviceexceptions.UnauthorizedException;
 
 public class UserServiceTests implements BaseTests{
 
     @AfterEach
     public void clearAll(){
-        gameDOA.clear();
-        userDOA.clear();
-        authDOA.clear();
+        GAME_DAO.clear();
+        USER_DAO.clear();
+        AUTH_DAO.clear();
     }
 
     @Test
@@ -29,14 +29,14 @@ public class UserServiceTests implements BaseTests{
         String email = "test@gmail.com";
         RegisterRequest registerRequest = new RegisterRequest(username, password, email);
 
-        RegisterResult registerResult =  userService.register(registerRequest);
+        RegisterResult registerResult =  USER_SERVICE.register(registerRequest);
 
         //Assert that the Result class is correct
         Assertions.assertEquals(username, registerResult.username());
         Assertions.assertNotNull(registerResult.authToken());
 
         //Assert that the user is in the db
-        UserData user = userDOA.getUser(username);
+        UserData user = USER_DAO.getUser(username);
         Assertions.assertNotNull(user);
 
         //Assert that the data in the db is correct
@@ -54,7 +54,7 @@ public class UserServiceTests implements BaseTests{
         RegisterRequest registerRequest = new RegisterRequest(username, password, email);
 
         Assertions.assertThrows(AlreadyTakenException.class,
-                () ->  userService.register(registerRequest));
+                () ->  USER_SERVICE.register(registerRequest));
     }
 
     @Test
@@ -64,14 +64,14 @@ public class UserServiceTests implements BaseTests{
         addUser(username, password, "Test");
         LoginRequest loginRequest = new LoginRequest(username, password);
 
-        LoginResult loginResult = userService.login(loginRequest);
+        LoginResult loginResult = USER_SERVICE.login(loginRequest);
 
         //Assert that the Result class is correct
         Assertions.assertEquals(username, loginResult.username());
         Assertions.assertNotNull(loginResult.authToken());
 
         //Assert that the AuthToken is in the db
-        AuthData authData = authDOA.getAuth(loginResult.authToken());
+        AuthData authData = AUTH_DAO.getAuth(loginResult.authToken());
         Assertions.assertNotNull(authData);
 
         //Assert that the data in the db is correct
@@ -86,7 +86,7 @@ public class UserServiceTests implements BaseTests{
         LoginRequest loginRequest = new LoginRequest(username, password);
 
         Assertions.assertThrows(UnauthorizedException.class,
-                () -> userService.login(loginRequest));
+                () -> USER_SERVICE.login(loginRequest));
     }
 
     @Test
@@ -97,7 +97,7 @@ public class UserServiceTests implements BaseTests{
         LoginRequest loginRequest = new LoginRequest(username, password);
 
         Assertions.assertThrows(UnauthorizedException.class,
-                () -> userService.login(loginRequest));
+                () -> USER_SERVICE.login(loginRequest));
     }
 
     @Test
@@ -106,9 +106,9 @@ public class UserServiceTests implements BaseTests{
         addAuth(authToken, "Test");
         LogoutRequest logoutRequest = new LogoutRequest(authToken);
 
-        userService.logout(logoutRequest);
+        USER_SERVICE.logout(logoutRequest);
 
-        Assertions.assertNull(authDOA.getAuth(authToken));
+        Assertions.assertNull(AUTH_DAO.getAuth(authToken));
     }
 
     @Test
@@ -118,6 +118,6 @@ public class UserServiceTests implements BaseTests{
         LogoutRequest logoutRequest = new LogoutRequest(authToken);
 
         Assertions.assertThrows(UnauthorizedException.class,
-                () -> userService.logout(logoutRequest));
+                () -> USER_SERVICE.logout(logoutRequest));
     }
 }
