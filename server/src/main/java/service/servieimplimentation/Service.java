@@ -1,16 +1,14 @@
 package service.servieimplimentation;
 
-import dataaccess.MemoryAuthDAO;
-import dataaccess.MemoryGameDAO;
-import dataaccess.MemoryUserDAO;
+import dataaccess.*;
 import service.serviceexceptions.UnauthorizedException;
 
 import java.util.UUID;
 
 public interface Service {
-    MemoryUserDAO USER_DAO = new MemoryUserDAO();
-    MemoryAuthDAO AUTH_DAO = new MemoryAuthDAO();
-    MemoryGameDAO GAME_DAO = new MemoryGameDAO();
+    UserDAO USER_DAO = new MemoryUserDAO();
+    AuthDAO AUTH_DAO = new MemoryAuthDAO();
+    GameDAO GAME_DAO = new MemoryGameDAO();
 
     default String generateToken() {
         return UUID.randomUUID().toString();
