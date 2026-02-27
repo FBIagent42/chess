@@ -25,8 +25,8 @@ public interface BaseTests {
         USER_DAO.createUser(new UserData(username, password, email));
     }
 
-    default void addGame(int gameID, String gameName, ChessGame game){
-        GAME_DAO.createGame(new GameData(gameID, null, null, gameName, game));
+    default int addGame(String gameName, ChessGame game){
+        return GAME_DAO.createGame(new GameData(0, null, null, gameName, game));
     }
 
 }

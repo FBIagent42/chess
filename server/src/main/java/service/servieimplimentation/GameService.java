@@ -10,9 +10,6 @@ import service.resulsts.ListGamesResult;
 import service.serviceexceptions.*;
 
 public class GameService implements Service{
-
-    private static int nextGameID = 1;
-
     public ListGamesResult listGames(ListGamesRequest listGamesRequest){
         varifyAuth(listGamesRequest.authToken());
         return new ListGamesResult(GAME_DAO.listGames());
@@ -22,11 +19,10 @@ public class GameService implements Service{
 
         varifyAuth(createGameRequest.authToken());
 
-        GameData game = new GameData(nextGameID, null, null, name, new ChessGame());
-        nextGameID++;
-        GAME_DAO.createGame(game);
+        GameData game = new GameData(0, null, null, name, new ChessGame());
+        int gameID = GAME_DAO.createGame(game);
 
-        return new CreateGameResult(nextGameID - 1);
+        return new CreateGameResult(gameID);
     }
     public void joinGame(JoinGameRequest joinGameRequest){
         varifyAuth(joinGameRequest.authToken());

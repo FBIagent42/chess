@@ -13,7 +13,7 @@ public class ClearServiceTest implements BaseTests{
     public void positiveClear(){
         addAuth("Test", "Test");
         addUser("Corbin", "Test", "Test");
-        addGame(1234, "Test", new ChessGame());
+        addGame("Test", new ChessGame());
 
         CLEAR_SERVICE.clear();
 

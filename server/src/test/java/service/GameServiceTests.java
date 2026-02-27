@@ -32,10 +32,11 @@ public class GameServiceTests implements BaseTests {
         addAuth(authToken, "Test");
         ListGamesRequest listGamesRequest = new ListGamesRequest(authToken);
 
-        GameData game1 = new GameData(1, null, null, "test2ElectricBoogalo", new ChessGame());
-        GameData game2 = new GameData(1234, "Corbin", "Bill", "Test", new ChessGame());
-        GAME_DAO.createGame(game1);
-        GAME_DAO.createGame(game2);
+        GameData game1 = new GameData(0, null, null, "test2ElectricBoogalo", new ChessGame());
+        GameData game2 = new GameData(0, "Corbin", "Bill", "Test", new ChessGame());
+
+        game1 = GAME_DAO.getGame(GAME_DAO.createGame(game1));
+        game2 = GAME_DAO.getGame(GAME_DAO.createGame(game2));
 
         ListGamesResult listGamesResult = GAME_SERVICE.listGames(listGamesRequest);
 
@@ -86,8 +87,7 @@ public class GameServiceTests implements BaseTests {
         String color = "WHITE";
         String name = "Corbin";
         String authToken = "Test";
-        int gameID = 8;
-        addGame(gameID, "Test", new ChessGame());
+        int gameID = addGame("Test", new ChessGame());
         addAuth(authToken, name);
 
         JoinGameRequest joinGameRequest = new JoinGameRequest(authToken, color, gameID);
@@ -104,8 +104,7 @@ public class GameServiceTests implements BaseTests {
         String color = "BLACK";
         String name = "Bill";
         String authToken = "Test";
-        int gameID = 8;
-        addGame(gameID, "Test", new ChessGame());
+        int gameID = addGame("Test", new ChessGame());
         addAuth(authToken, name);
 
         JoinGameRequest joinGameRequest = new JoinGameRequest("Test", color, gameID);
@@ -120,10 +119,9 @@ public class GameServiceTests implements BaseTests {
     @Test
     public void negativeJoinGameUnauthorized() {
         String color = "WHITE";
-        int gameID = 1234;
         String authToken = "Wrong";
         addAuth("Right", "Test");
-        addGame(gameID, "Test", new ChessGame());
+        int gameID = addGame("Test", new ChessGame());
 
         JoinGameRequest joinGameRequest = new JoinGameRequest(authToken, color, gameID);
 
@@ -134,12 +132,11 @@ public class GameServiceTests implements BaseTests {
     @Test
     public void negativeJoinGameNoGame(){
         String color = "WHITE";
-        int gameID = 42;
         String authToken = "Test";
         addAuth(authToken, "Test");
-        addGame(1, "Test", new ChessGame());
+        addGame("Test", new ChessGame());
 
-        JoinGameRequest joinGameRequest = new JoinGameRequest(authToken, color, gameID);
+        JoinGameRequest joinGameRequest = new JoinGameRequest(authToken, color, 100);
 
         Assertions.assertThrows(NoGameException.class,
                 () -> GAME_SERVICE.joinGame(joinGameRequest));
@@ -148,10 +145,10 @@ public class GameServiceTests implements BaseTests {
     @Test
     public void negativeWhiteJoinGame(){
         String color = "WHITE";
-        int gameID = 1234;
         String authToken = "Test";
+        int gameID = GAME_DAO.createGame(new GameData(0, "Full", null, "Test", new ChessGame()));
         addAuth(authToken, "Test");
-        GAME_DAO.createGame(new GameData(gameID, "Full", null, "Test", new ChessGame()));
+
         JoinGameRequest joinGameRequest = new JoinGameRequest(authToken, color, gameID);
 
         Assertions.assertThrows(ColorTakenException.class,
@@ -161,10 +158,9 @@ public class GameServiceTests implements BaseTests {
     @Test
     public void negativeBlackJoinGame(){
         String color = "BLACK";
-        int gameID = 1234;
+        int gameID = GAME_DAO.createGame(new GameData(0, null, "Full", "Test", new ChessGame()));
         String authToken = "Test";
         addAuth(authToken, "Test");
-        GAME_DAO.createGame(new GameData(gameID, null, "Full", "Test", new ChessGame()));
         JoinGameRequest joinGameRequest = new JoinGameRequest(authToken, color, gameID);
 
         Assertions.assertThrows(ColorTakenException.class,

@@ -5,10 +5,14 @@ import java.util.*;
 
 public class MemoryGameDAO implements GameDAO {
     private static final Map<Integer, GameData> DB = new HashMap<>();
+    private static int nextID = 1;
 
     @Override
-    public void createGame(GameData game) {
-        DB.put(game.gameID(), game);
+    public int createGame(GameData game) {
+        GameData newGame = new GameData(nextID, game.whiteUsername(), game.blackUsername(), game.gameName(), game.game());
+        DB.put(nextID, newGame);
+        nextID++;
+        return nextID - 1;
     }
 
     @Override
