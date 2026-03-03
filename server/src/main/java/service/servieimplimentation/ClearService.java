@@ -1,6 +1,6 @@
 package service.servieimplimentation;
 
-public class ClearService implements Service {
+public class ClearService extends Service {
 
     public void clear(){
         GAME_DAO.clear();

@@ -9,7 +9,7 @@ import service.resulsts.LoginResult;
 import service.resulsts.RegisterResult;
 import service.serviceexceptions.*;
 
-public class UserService implements Service{
+public class UserService extends Service{
 
     public RegisterResult register(RegisterRequest registerRequest) {
         String username = registerRequest.username();
@@ -38,7 +38,7 @@ public class UserService implements Service{
     }
     public void logout(LogoutRequest logoutRequest) {
         String authToken = logoutRequest.authToken();
-        varifyAuth(authToken);
+        verifyAuth(authToken);
 
         AUTH_DAO.deleteAuth(authToken);
     }

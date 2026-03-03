@@ -5,16 +5,22 @@ import service.serviceexceptions.UnauthorizedException;
 
 import java.util.UUID;
 
-public interface Service {
-    UserDAO USER_DAO = new MemoryUserDAO();
-    AuthDAO AUTH_DAO = new MemoryAuthDAO();
-    GameDAO GAME_DAO = new MemoryGameDAO();
+public class Service {
+    protected static UserDAO USER_DAO = new MemoryUserDAO();
+    protected static AuthDAO AUTH_DAO = new MemoryAuthDAO();
+    protected static GameDAO GAME_DAO = new MemoryGameDAO();
 
-    default String generateToken() {
+    public void setDaos(UserDAO userDao, AuthDAO authDao, GameDAO gameDao) {
+        USER_DAO = userDao;
+        AUTH_DAO = authDao;
+        GAME_DAO = gameDao;
+    }
+
+    String generateToken() {
         return UUID.randomUUID().toString();
     }
 
-    default void varifyAuth(String authToken){
+    void verifyAuth(String authToken){
         if(AUTH_DAO.getAuth(authToken) == null){
             throw(new UnauthorizedException());
         }
