@@ -20,7 +20,7 @@ public class Service {
         return UUID.randomUUID().toString();
     }
 
-    void verifyAuth(String authToken){
+    void verifyAuth(String authToken) throws DataAccessException {
         if(AUTH_DAO.getAuth(authToken) == null){
             throw(new UnauthorizedException());
         }

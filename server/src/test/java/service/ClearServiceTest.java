@@ -1,6 +1,7 @@
 package service;
 
 import chess.ChessGame;
+import dataaccess.DataAccessException;
 import model.AuthData;
 import model.GameData;
 import model.UserData;
@@ -10,7 +11,7 @@ import org.junit.jupiter.api.Test;
 public class ClearServiceTest implements BaseTests{
 
     @Test
-    public void positiveClear(){
+    public void positiveClear() throws DataAccessException {
         addAuth("Test", "Test");
         addUser("Corbin", "Test", "Test");
         addGame("Test", new ChessGame());

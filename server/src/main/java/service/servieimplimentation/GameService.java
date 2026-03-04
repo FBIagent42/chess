@@ -1,6 +1,7 @@
 package service.servieimplimentation;
 
 import chess.ChessGame;
+import dataaccess.DataAccessException;
 import model.GameData;
 import service.requests.CreateGameRequest;
 import service.requests.JoinGameRequest;
@@ -10,11 +11,11 @@ import service.resulsts.ListGamesResult;
 import service.serviceexceptions.*;
 
 public class GameService extends Service{
-    public ListGamesResult listGames(ListGamesRequest listGamesRequest){
+    public ListGamesResult listGames(ListGamesRequest listGamesRequest) throws DataAccessException {
         verifyAuth(listGamesRequest.authToken());
         return new ListGamesResult(GAME_DAO.listGames());
     }
-    public CreateGameResult createGame(CreateGameRequest createGameRequest){
+    public CreateGameResult createGame(CreateGameRequest createGameRequest) throws DataAccessException {
         String name = createGameRequest.gameName();
 
         verifyAuth(createGameRequest.authToken());
@@ -24,7 +25,7 @@ public class GameService extends Service{
 
         return new CreateGameResult(gameID);
     }
-    public void joinGame(JoinGameRequest joinGameRequest){
+    public void joinGame(JoinGameRequest joinGameRequest) throws DataAccessException {
         verifyAuth(joinGameRequest.authToken());
 
         String color = joinGameRequest.playerColor();

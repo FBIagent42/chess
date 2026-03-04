@@ -1,6 +1,7 @@
 package service;
 
 import chess.ChessGame;
+import dataaccess.DataAccessException;
 import model.GameData;
 import org.junit.jupiter.api.AfterEach;
 import org.junit.jupiter.api.Assertions;
@@ -20,14 +21,14 @@ import java.util.List;
 public class GameServiceTests implements BaseTests {
 
     @AfterEach
-    public void clearAll(){
+    public void clearAll() throws DataAccessException {
         GAME_DAO.clear();
         USER_DAO.clear();
         AUTH_DAO.clear();
     }
 
     @Test
-    public void positiveListGames() {
+    public void positiveListGames() throws DataAccessException {
         String authToken = "Test";
         addAuth(authToken, "Test");
         ListGamesRequest listGamesRequest = new ListGamesRequest(authToken);
@@ -47,7 +48,7 @@ public class GameServiceTests implements BaseTests {
     }
 
     @Test
-    public void negativeListGames() {
+    public void negativeListGames() throws DataAccessException {
         String authToken = "Wrong";
         addAuth("Right", "Test");
         ListGamesRequest listGamesRequest = new ListGamesRequest(authToken);
@@ -57,7 +58,7 @@ public class GameServiceTests implements BaseTests {
     }
 
     @Test
-    public void positiveCreateGame() {
+    public void positiveCreateGame() throws DataAccessException {
         String gameName = "test2ElectricBoogalo";
         String authToken = "Test";
         addAuth(authToken, "Test");
@@ -72,7 +73,7 @@ public class GameServiceTests implements BaseTests {
     }
 
     @Test
-    public void negativeCreateGame() {
+    public void negativeCreateGame() throws DataAccessException {
         String gameName = "Im sad :(";
         String authToken = "Wrong";
         addAuth("Right", "Test");
@@ -83,7 +84,7 @@ public class GameServiceTests implements BaseTests {
     }
 
     @Test
-    public void positiveWhiteJoinGame() {
+    public void positiveWhiteJoinGame() throws DataAccessException {
         String color = "WHITE";
         String name = "Corbin";
         String authToken = "Test";
@@ -100,7 +101,7 @@ public class GameServiceTests implements BaseTests {
     }
 
     @Test
-    public void positiveBlackJoinGame() {
+    public void positiveBlackJoinGame() throws DataAccessException {
         String color = "BLACK";
         String name = "Bill";
         String authToken = "Test";
@@ -117,7 +118,7 @@ public class GameServiceTests implements BaseTests {
     }
 
     @Test
-    public void negativeJoinGameUnauthorized() {
+    public void negativeJoinGameUnauthorized() throws DataAccessException {
         String color = "WHITE";
         String authToken = "Wrong";
         addAuth("Right", "Test");
@@ -130,7 +131,7 @@ public class GameServiceTests implements BaseTests {
     }
 
     @Test
-    public void negativeJoinGameNoGame(){
+    public void negativeJoinGameNoGame() throws DataAccessException {
         String color = "WHITE";
         String authToken = "Test";
         addAuth(authToken, "Test");
@@ -143,7 +144,7 @@ public class GameServiceTests implements BaseTests {
     }
 
     @Test
-    public void negativeWhiteJoinGame(){
+    public void negativeWhiteJoinGame() throws DataAccessException {
         String color = "WHITE";
         String authToken = "Test";
         int gameID = GAME_DAO.createGame(new GameData(0, "Full", null, "Test", new ChessGame()));
@@ -156,7 +157,7 @@ public class GameServiceTests implements BaseTests {
     }
 
     @Test
-    public void negativeBlackJoinGame(){
+    public void negativeBlackJoinGame() throws DataAccessException {
         String color = "BLACK";
         int gameID = GAME_DAO.createGame(new GameData(0, null, "Full", "Test", new ChessGame()));
         String authToken = "Test";

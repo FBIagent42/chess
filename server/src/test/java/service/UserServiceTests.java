@@ -1,5 +1,6 @@
 package service;
 
+import dataaccess.DataAccessException;
 import model.AuthData;
 import model.UserData;
 import org.junit.jupiter.api.AfterEach;
@@ -16,14 +17,14 @@ import service.serviceexceptions.UnauthorizedException;
 public class UserServiceTests implements BaseTests{
 
     @AfterEach
-    public void clearAll(){
+    public void clearAll() throws DataAccessException {
         GAME_DAO.clear();
         USER_DAO.clear();
         AUTH_DAO.clear();
     }
 
     @Test
-    public void positiveRegister(){
+    public void positiveRegister() throws DataAccessException {
         String username = "Corbin C";
         String password = "1234";
         String email = "test@gmail.com";
@@ -46,7 +47,7 @@ public class UserServiceTests implements BaseTests{
     }
 
     @Test
-    public void negativeRegister(){
+    public void negativeRegister() throws DataAccessException {
         String username = "Corbin";
         String password = "1234";
         String email = "test@gmail.com";
@@ -58,7 +59,7 @@ public class UserServiceTests implements BaseTests{
     }
 
     @Test
-    public void positiveLogin(){
+    public void positiveLogin() throws DataAccessException {
         String username = "Corbin";
         String password = "1234";
         addUser(username, password, "Test");
@@ -90,7 +91,7 @@ public class UserServiceTests implements BaseTests{
     }
 
     @Test
-    public void negativeLoginWrongPassword(){
+    public void negativeLoginWrongPassword() throws DataAccessException {
         String username = "Corbin";
         String password = "1";
         addUser(username, "Different", "Test");
@@ -101,7 +102,7 @@ public class UserServiceTests implements BaseTests{
     }
 
     @Test
-    public void positiveLogout(){
+    public void positiveLogout() throws DataAccessException {
         String authToken = "1111";
         addAuth(authToken, "Test");
         LogoutRequest logoutRequest = new LogoutRequest(authToken);
@@ -112,7 +113,7 @@ public class UserServiceTests implements BaseTests{
     }
 
     @Test
-    public void negativeLogout(){
+    public void negativeLogout() throws DataAccessException {
         String authToken = "Wrong";
         addAuth("Right", "Test");
         LogoutRequest logoutRequest = new LogoutRequest(authToken);

@@ -35,8 +35,10 @@ public class LoginHandler implements Handler {
             body = new Gson().toJson(Map.of("message", "Error: Unauthorized."));
             context.status(401)
                     .json(body);
-        } catch (DataAccessException e) {
-            throw new RuntimeException(e);
+        } catch (DataAccessException ex){
+            body = new Gson().toJson(Map.of("message", "Error: SQL Error." + ex.getLocalizedMessage()));
+            context.status(500)
+                    .json(body);
         }
     }
 }

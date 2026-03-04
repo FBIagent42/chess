@@ -21,11 +21,11 @@ public interface BaseTests {
         AUTH_DAO.createAuth(new AuthData(authToken, username));
     }
 
-    default void addUser(String username, String password, String email){
+    default void addUser(String username, String password, String email) throws DataAccessException {
         USER_DAO.createUser(new UserData(username, password, email));
     }
 
-    default int addGame(String gameName, ChessGame game){
+    default int addGame(String gameName, ChessGame game) throws DataAccessException {
         return GAME_DAO.createGame(new GameData(0, null, null, gameName, game));
     }
 
