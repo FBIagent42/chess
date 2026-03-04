@@ -37,7 +37,7 @@ public class UserService extends Service{
 
         return new LoginResult(username, authToken);
     }
-    public void logout(LogoutRequest logoutRequest) {
+    public void logout(LogoutRequest logoutRequest) throws DataAccessException {
         String authToken = logoutRequest.authToken();
         verifyAuth(authToken);
 
