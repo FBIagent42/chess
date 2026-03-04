@@ -6,6 +6,11 @@ import java.util.Collection;
 import java.util.List;
 
 public class SQLGameDAO implements GameDAO{
+
+    public SQLGameDAO(){
+
+    }
+
     @Override
     public int createGame(GameData game) {
         return 0;

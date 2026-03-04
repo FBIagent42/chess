@@ -1,5 +1,6 @@
 package service.servieimplimentation;
 
+import dataaccess.DataAccessException;
 import model.AuthData;
 import model.UserData;
 import service.requests.LoginRequest;
@@ -11,7 +12,7 @@ import service.serviceexceptions.*;
 
 public class UserService extends Service{
 
-    public RegisterResult register(RegisterRequest registerRequest) {
+    public RegisterResult register(RegisterRequest registerRequest) throws DataAccessException {
         String username = registerRequest.username();
         UserData user =  USER_DAO.getUser(username);
         if(user != null){
@@ -24,7 +25,7 @@ public class UserService extends Service{
 
         return new RegisterResult(username, authToken);
     }
-    public LoginResult login(LoginRequest loginRequest) {
+    public LoginResult login(LoginRequest loginRequest) throws DataAccessException {
         String username = loginRequest.username();
         UserData user =  USER_DAO.getUser(username);
         if(user == null || !user.password().equals(loginRequest.password())){

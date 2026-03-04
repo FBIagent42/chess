@@ -1,6 +1,7 @@
 package handler;
 
 import com.google.gson.Gson;
+import dataaccess.DataAccessException;
 import io.javalin.http.Context;
 import io.javalin.http.Handler;
 import org.jetbrains.annotations.NotNull;
@@ -34,6 +35,8 @@ public class LoginHandler implements Handler {
             body = new Gson().toJson(Map.of("message", "Error: Unauthorized."));
             context.status(401)
                     .json(body);
+        } catch (DataAccessException e) {
+            throw new RuntimeException(e);
         }
     }
 }

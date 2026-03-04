@@ -17,7 +17,7 @@ public interface BaseTests {
     GameDAO GAME_DAO = new MemoryGameDAO();
     AuthDAO AUTH_DAO = new MemoryAuthDAO();
 
-    default void addAuth(String authToken, String username){
+    default void addAuth(String authToken, String username) throws DataAccessException {
         AUTH_DAO.createAuth(new AuthData(authToken, username));
     }
 
