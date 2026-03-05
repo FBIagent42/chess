@@ -20,6 +20,7 @@ import java.util.List;
 
 public class GameServiceTests implements BaseTests {
 
+
     @AfterEach
     public void clearAll() throws DataAccessException {
         GAME_DAO.clear();

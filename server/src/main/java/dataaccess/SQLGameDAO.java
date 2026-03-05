@@ -18,12 +18,14 @@ public class SQLGameDAO implements GameDAO{
 
     @Override
     public int createGame(GameData game) throws DataAccessException {
-        var statement = "INSERT INTO game (gameName, game) VALUES (?, ?)";
+        var statement = "INSERT INTO game (gameName, whiteUsername, blackUsername, game) VALUES (?, ?, ?, ?)";
         String json = new Gson().toJson(game.game());
         try (Connection conn = DatabaseManager.getConnection()) {
             try (PreparedStatement ps = conn.prepareStatement(statement, RETURN_GENERATED_KEYS)) {
                 ps.setString(1, game.gameName());
-                ps.setString(2, json);
+                ps.setString(2, game.whiteUsername());
+                ps.setString(3, game.blackUsername());
+                ps.setString(4, json);
                 ps.executeUpdate();
 
                 var resultSet = ps.getGeneratedKeys();
@@ -35,7 +37,7 @@ public class SQLGameDAO implements GameDAO{
                 return gameID;
             }
         } catch (SQLException | DataAccessException ex) {
-            throw new DataAccessException("SQL Error", ex);
+            throw new DataAccessException(ex.getLocalizedMessage());
         }
     }
 
@@ -46,13 +48,12 @@ public class SQLGameDAO implements GameDAO{
             try (PreparedStatement ps = conn.prepareStatement(statement)) {
                 ps.setInt(1, gameID);
                 try (var rs = ps.executeQuery()) {
-                    rs.next();
                     List<GameData> games = logGame(rs);
                     return games.getFirst();
                 }
             }
         } catch (SQLException | DataAccessException ex) {
-            throw new DataAccessException("SQL Error", ex);
+            throw new DataAccessException(ex.getLocalizedMessage());
         }
     }
 
@@ -66,7 +67,7 @@ public class SQLGameDAO implements GameDAO{
                 }
             }
         } catch (SQLException | DataAccessException ex) {
-            throw new DataAccessException("SQL Error", ex);
+            throw new DataAccessException(ex.getLocalizedMessage());
         }
     }
 
@@ -84,7 +85,7 @@ public class SQLGameDAO implements GameDAO{
                 ps.executeUpdate();
             }
         } catch (SQLException | DataAccessException ex) {
-            throw new DataAccessException("SQL Error", ex);
+            throw new DataAccessException(ex.getLocalizedMessage());
         }
     }
 
@@ -96,7 +97,7 @@ public class SQLGameDAO implements GameDAO{
                 preparedStatement.executeUpdate();
             }
         } catch (SQLException | DataAccessException ex) {
-            throw new DataAccessException("SQL Error", ex);
+            throw new DataAccessException(ex.getLocalizedMessage());
         }
     }
 

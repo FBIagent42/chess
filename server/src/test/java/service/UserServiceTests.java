@@ -6,6 +6,7 @@ import model.UserData;
 import org.junit.jupiter.api.AfterEach;
 import org.junit.jupiter.api.Assertions;
 import org.junit.jupiter.api.Test;
+import org.mindrot.jbcrypt.BCrypt;
 import service.requests.LoginRequest;
 import service.requests.LogoutRequest;
 import service.requests.RegisterRequest;
@@ -42,7 +43,7 @@ public class UserServiceTests implements BaseTests{
 
         //Assert that the data in the db is correct
         Assertions.assertEquals(username, user.username());
-        Assertions.assertEquals(password, user.password());
+        Assertions.assertTrue(BCrypt.checkpw(password, user.password()));
         Assertions.assertEquals(email, user.email());
     }
 
@@ -62,7 +63,8 @@ public class UserServiceTests implements BaseTests{
     public void positiveLogin() throws DataAccessException {
         String username = "Corbin";
         String password = "1234";
-        addUser(username, password, "Test");
+        String hashedPassword = BCrypt.hashpw(password, BCrypt.gensalt());
+        addUser(username, hashedPassword, "Test");
         LoginRequest loginRequest = new LoginRequest(username, password);
 
         LoginResult loginResult = USER_SERVICE.login(loginRequest);
@@ -94,7 +96,8 @@ public class UserServiceTests implements BaseTests{
     public void negativeLoginWrongPassword() throws DataAccessException {
         String username = "Corbin";
         String password = "1";
-        addUser(username, "Different", "Test");
+        String wrongPassword = BCrypt.hashpw("Different", BCrypt.gensalt());
+        addUser(username, wrongPassword, "Test");
         LoginRequest loginRequest = new LoginRequest(username, password);
 
         Assertions.assertThrows(UnauthorizedException.class,

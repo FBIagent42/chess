@@ -14,31 +14,34 @@ public class SQLUserDAO implements UserDAO{
             try (PreparedStatement ps = conn.prepareStatement(statement)) {
                 ps.setString(1, user.username());
                 ps.setString(2, user.password());
-                ps.setString(2, user.email());
+                ps.setString(3, user.email());
                 ps.executeUpdate();
             }
         } catch (SQLException | DataAccessException ex) {
-            throw new DataAccessException("SQL Error", ex);
+            throw new DataAccessException(ex.getLocalizedMessage());
         }
     }
 
     @Override
     public UserData getUser(String username) throws DataAccessException {
-        var statement = "SELECT username, password, email FROM auth WHERE username = ?";
+        var statement = "SELECT username, password, email FROM user WHERE username = ?";
         try (Connection conn = DatabaseManager.getConnection()) {
             try (PreparedStatement ps = conn.prepareStatement(statement)) {
                 ps.setString(1, username);
                 try (var rs = ps.executeQuery()) {
-                    rs.next();
-                    var name = rs.getString("username");
-                    var password = rs.getString("password");
-                    var email = rs.getString("email");
-                    return new UserData(name, password, email);
+                    if(rs.next()) {
+                        var name = rs.getString("username");
+                        var password = rs.getString("password");
+                        var email = rs.getString("email");
+                        return new UserData(name, password, email);
+                    }
                 }
             }
         } catch (SQLException | DataAccessException ex) {
-            throw new DataAccessException("SQL Error", ex);
+            throw new DataAccessException(ex.getLocalizedMessage());
         }
+
+        return null;
     }
 
     @Override
@@ -49,7 +52,7 @@ public class SQLUserDAO implements UserDAO{
                 preparedStatement.executeUpdate();
             }
         } catch (SQLException | DataAccessException ex) {
-            throw new DataAccessException("SQL Error", ex);
+            throw new DataAccessException(ex.getLocalizedMessage());
         }
     }
 }

@@ -3,6 +3,7 @@ package service.servieimplimentation;
 import dataaccess.DataAccessException;
 import model.AuthData;
 import model.UserData;
+import org.mindrot.jbcrypt.BCrypt;
 import service.requests.LoginRequest;
 import service.requests.LogoutRequest;
 import service.requests.RegisterRequest;
@@ -14,12 +15,13 @@ public class UserService extends Service{
 
     public RegisterResult register(RegisterRequest registerRequest) throws DataAccessException {
         String username = registerRequest.username();
+        String hashedPassword = BCrypt.hashpw(registerRequest.password(), BCrypt.gensalt());
         UserData user =  USER_DAO.getUser(username);
         if(user != null){
             throw(new AlreadyTakenException());
         }
 
-        USER_DAO.createUser(new UserData(username, registerRequest.password(), registerRequest.email()));
+        USER_DAO.createUser(new UserData(username, hashedPassword, registerRequest.email()));
         String authToken = generateToken();
         AUTH_DAO.createAuth(new AuthData(authToken, username));
 
@@ -28,7 +30,7 @@ public class UserService extends Service{
     public LoginResult login(LoginRequest loginRequest) throws DataAccessException {
         String username = loginRequest.username();
         UserData user =  USER_DAO.getUser(username);
-        if(user == null || !user.password().equals(loginRequest.password())){
+        if(user == null || !BCrypt.checkpw(loginRequest.password(), user.password())){
             throw(new UnauthorizedException());
         }
 

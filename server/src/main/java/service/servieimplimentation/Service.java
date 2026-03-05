@@ -6,9 +6,19 @@ import service.serviceexceptions.UnauthorizedException;
 import java.util.UUID;
 
 public class Service {
-    protected static UserDAO USER_DAO = new MemoryUserDAO();
-    protected static AuthDAO AUTH_DAO = new MemoryAuthDAO();
-    protected static GameDAO GAME_DAO = new MemoryGameDAO();
+    protected static UserDAO USER_DAO;
+    protected static AuthDAO AUTH_DAO;
+    protected static GameDAO GAME_DAO;
+
+    static {
+        try{
+            USER_DAO = new SQLUserDAO();
+            AUTH_DAO = new SQLAuthDAO();
+            GAME_DAO = new SQLGameDAO();
+        } catch (DataAccessException ex){
+            throw new RuntimeException("Unable to connect to server");
+        }
+    }
 
     public void setDaos(UserDAO userDao, AuthDAO authDao, GameDAO gameDao) {
         USER_DAO = userDao;
