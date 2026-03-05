@@ -16,26 +16,26 @@ public class UserService extends Service{
     public RegisterResult register(RegisterRequest registerRequest) throws DataAccessException {
         String username = registerRequest.username();
         String hashedPassword = BCrypt.hashpw(registerRequest.password(), BCrypt.gensalt());
-        UserData user =  USER_DAO.getUser(username);
+        UserData user =  userDAO.getUser(username);
         if(user != null){
             throw(new AlreadyTakenException());
         }
 
-        USER_DAO.createUser(new UserData(username, hashedPassword, registerRequest.email()));
+        userDAO.createUser(new UserData(username, hashedPassword, registerRequest.email()));
         String authToken = generateToken();
-        AUTH_DAO.createAuth(new AuthData(authToken, username));
+        authDAO.createAuth(new AuthData(authToken, username));
 
         return new RegisterResult(username, authToken);
     }
     public LoginResult login(LoginRequest loginRequest) throws DataAccessException {
         String username = loginRequest.username();
-        UserData user =  USER_DAO.getUser(username);
+        UserData user =  userDAO.getUser(username);
         if(user == null || !BCrypt.checkpw(loginRequest.password(), user.password())){
             throw(new UnauthorizedException());
         }
 
         String authToken = generateToken();
-        AUTH_DAO.createAuth(new AuthData(authToken, username));
+        authDAO.createAuth(new AuthData(authToken, username));
 
         return new LoginResult(username, authToken);
     }
@@ -43,6 +43,6 @@ public class UserService extends Service{
         String authToken = logoutRequest.authToken();
         verifyAuth(authToken);
 
-        AUTH_DAO.deleteAuth(authToken);
+        authDAO.deleteAuth(authToken);
     }
 }

@@ -6,24 +6,24 @@ import service.serviceexceptions.UnauthorizedException;
 import java.util.UUID;
 
 public class Service {
-    protected static UserDAO USER_DAO;
-    protected static AuthDAO AUTH_DAO;
-    protected static GameDAO GAME_DAO;
+    protected static UserDAO userDAO;
+    protected static AuthDAO authDAO;
+    protected static GameDAO gameDAO;
 
     static {
         try{
-            USER_DAO = new SQLUserDAO();
-            AUTH_DAO = new SQLAuthDAO();
-            GAME_DAO = new SQLGameDAO();
+            userDAO = new SQLUserDAO();
+            authDAO = new SQLAuthDAO();
+            gameDAO = new SQLGameDAO();
         } catch (DataAccessException ex){
             throw new RuntimeException("Unable to connect to server");
         }
     }
 
     public void setDaos(UserDAO userDao, AuthDAO authDao, GameDAO gameDao) {
-        USER_DAO = userDao;
-        AUTH_DAO = authDao;
-        GAME_DAO = gameDao;
+        userDAO = userDao;
+        authDAO = authDao;
+        gameDAO = gameDao;
     }
 
     String generateToken() {
@@ -31,7 +31,7 @@ public class Service {
     }
 
     void verifyAuth(String authToken) throws DataAccessException {
-        if(AUTH_DAO.getAuth(authToken) == null){
+        if(authDAO.getAuth(authToken) == null){
             throw(new UnauthorizedException());
         }
     }

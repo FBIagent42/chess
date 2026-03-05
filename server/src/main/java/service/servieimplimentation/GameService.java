@@ -13,7 +13,7 @@ import service.serviceexceptions.*;
 public class GameService extends Service{
     public ListGamesResult listGames(ListGamesRequest listGamesRequest) throws DataAccessException {
         verifyAuth(listGamesRequest.authToken());
-        return new ListGamesResult(GAME_DAO.listGames());
+        return new ListGamesResult(gameDAO.listGames());
     }
     public CreateGameResult createGame(CreateGameRequest createGameRequest) throws DataAccessException {
         String name = createGameRequest.gameName();
@@ -21,7 +21,7 @@ public class GameService extends Service{
         verifyAuth(createGameRequest.authToken());
 
         GameData game = new GameData(0, null, null, name, new ChessGame());
-        int gameID = GAME_DAO.createGame(game);
+        int gameID = gameDAO.createGame(game);
 
         return new CreateGameResult(gameID);
     }
@@ -29,9 +29,9 @@ public class GameService extends Service{
         verifyAuth(joinGameRequest.authToken());
 
         String color = joinGameRequest.playerColor();
-        String username = AUTH_DAO.getAuth(joinGameRequest.authToken()).username();
+        String username = authDAO.getAuth(joinGameRequest.authToken()).username();
 
-        GameData game = GAME_DAO.getGame(joinGameRequest.gameID());
+        GameData game = gameDAO.getGame(joinGameRequest.gameID());
 
         if(game == null){
             throw(new NoGameException());
@@ -42,14 +42,14 @@ public class GameService extends Service{
         }
 
         if(color.equals("WHITE")){
-            GAME_DAO.updateGame(new GameData(game.gameID(),
+            gameDAO.updateGame(new GameData(game.gameID(),
                     username,
                     game.blackUsername(),
                     game.gameName(),
                     game.game()));
         }
         if(color.equals("BLACK")){
-            GAME_DAO.updateGame(new GameData(game.gameID(),
+            gameDAO.updateGame(new GameData(game.gameID(),
                     game.whiteUsername(),
                     username,
                     game.gameName(),
