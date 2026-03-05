@@ -15,7 +15,9 @@ public class SQLUserDAO implements UserDAO{
                 ps.setString(1, user.username());
                 ps.setString(2, user.password());
                 ps.setString(3, user.email());
-                ps.executeUpdate();
+                if(ps.executeUpdate() == 0){
+                    throw new DataAccessException("User failed to be added to database");
+                }
             }
         } catch (SQLException | DataAccessException ex) {
             throw new DataAccessException(ex.getLocalizedMessage());

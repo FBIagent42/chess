@@ -19,7 +19,9 @@ public class SQLAuthDAO implements AuthDAO{
             try (PreparedStatement ps = conn.prepareStatement(statement)) {
                 ps.setString(1, auth.authToken());
                 ps.setString(2, auth.username());
-                ps.executeUpdate();
+                if(ps.executeUpdate() == 0){
+                    throw new DataAccessException("Auth data failed to be added to database");
+                }
             }
         } catch (SQLException | DataAccessException ex) {
             throw new DataAccessException("SQL Error", ex);
@@ -48,9 +50,11 @@ public class SQLAuthDAO implements AuthDAO{
     public void deleteAuth(String authToken) throws DataAccessException {
         var statement = "DELETE FROM auth WHERE authToken = ?";
         try (Connection conn = DatabaseManager.getConnection()) {
-            try (var preparedStatement = conn.prepareStatement(statement)) {
-                preparedStatement.setString(1, authToken);
-                preparedStatement.executeUpdate();
+            try (var ps = conn.prepareStatement(statement)) {
+                ps.setString(1, authToken);
+                if(ps.executeUpdate() != 1){
+                    throw new DataAccessException("Auth failed to be removed from database");
+                }
             }
         } catch (SQLException | DataAccessException ex) {
             throw new DataAccessException("SQL Error", ex);

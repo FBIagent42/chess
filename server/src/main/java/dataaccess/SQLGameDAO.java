@@ -26,7 +26,9 @@ public class SQLGameDAO implements GameDAO{
                 ps.setString(2, game.whiteUsername());
                 ps.setString(3, game.blackUsername());
                 ps.setString(4, json);
-                ps.executeUpdate();
+                if(ps.executeUpdate() == 0){
+                    throw new DataAccessException("Game failed to be added to database");
+                }
 
                 var resultSet = ps.getGeneratedKeys();
                 var gameID = 0;
@@ -82,7 +84,9 @@ public class SQLGameDAO implements GameDAO{
                 ps.setString(3, gameData);
                 ps.setInt(4, game.gameID());
 
-                ps.executeUpdate();
+                if(ps.executeUpdate() == 0){
+                    throw new DataAccessException("Game failed to be updated in database");
+                }
             }
         } catch (SQLException | DataAccessException ex) {
             throw new DataAccessException(ex.getLocalizedMessage());
