@@ -38,7 +38,7 @@ public class RegisterHandler implements Handler {
             context.status(403)
                     .json(body);
         } catch (DataAccessException ex){
-            body = new Gson().toJson(Map.of("message", "Error: SQL Error." + ex.getLocalizedMessage()));
+            body = new Gson().toJson(Map.of("message", "Error: SQL Error: " + ex.getLocalizedMessage()));
             context.status(500)
                     .json(body);
         }
