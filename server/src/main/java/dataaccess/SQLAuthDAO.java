@@ -35,15 +35,18 @@ public class SQLAuthDAO implements AuthDAO{
             try (PreparedStatement ps = conn.prepareStatement(statement)) {
                 ps.setString(1, authToken);
                 try (var rs = ps.executeQuery()) {
-                    rs.next();
-                    var auth = rs.getString("authToken");
-                    var username = rs.getString("username");
-                    return new AuthData(auth, username);
+                    if(rs.next()) {
+                        var auth = rs.getString("authToken");
+                        var username = rs.getString("username");
+                        return new AuthData(auth, username);
+                    }
                 }
             }
         } catch (SQLException | DataAccessException ex) {
             throw new DataAccessException("SQL Error", ex);
         }
+
+        return null;
     }
 
     @Override

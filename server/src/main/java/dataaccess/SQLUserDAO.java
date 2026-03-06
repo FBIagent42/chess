@@ -50,8 +50,8 @@ public class SQLUserDAO implements UserDAO{
     public void clear() throws DataAccessException {
         var statement = "DELETE FROM user";
         try (Connection conn = DatabaseManager.getConnection()) {
-            try (var preparedStatement = conn.prepareStatement(statement)) {
-                preparedStatement.executeUpdate();
+            try (var ps = conn.prepareStatement(statement)) {
+                ps.executeUpdate();
             }
         } catch (SQLException | DataAccessException ex) {
             throw new DataAccessException(ex.getLocalizedMessage());
