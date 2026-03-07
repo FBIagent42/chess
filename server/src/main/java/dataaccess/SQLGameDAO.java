@@ -18,6 +18,9 @@ public class SQLGameDAO implements GameDAO{
 
     @Override
     public int createGame(GameData game) throws DataAccessException {
+        if(game.game() == null){
+            throw new DataAccessException("Error: No game");
+        }
         var statement = "INSERT INTO game (gameName, whiteUsername, blackUsername, game) VALUES (?, ?, ?, ?)";
         String json = new Gson().toJson(game.game());
         try (Connection conn = DatabaseManager.getConnection()) {
@@ -51,6 +54,9 @@ public class SQLGameDAO implements GameDAO{
                 ps.setInt(1, gameID);
                 try (var rs = ps.executeQuery()) {
                     List<GameData> games = logGame(rs);
+                    if(games.isEmpty()){
+                        return null;
+                    }
                     return games.getFirst();
                 }
             }
@@ -75,6 +81,9 @@ public class SQLGameDAO implements GameDAO{
 
     @Override
     public void updateGame(GameData game) throws DataAccessException {
+        if(game.game() == null){
+            throw new DataAccessException("No game to update");
+        }
         String gameData = new Gson().toJson(game.game());
         var statement = "UPDATE game SET whiteUsername = ?, blackUsername = ?, game = ? WHERE gameId=?";
         try (Connection conn = DatabaseManager.getConnection()) {
@@ -95,7 +104,7 @@ public class SQLGameDAO implements GameDAO{
 
     @Override
     public void clear() throws DataAccessException {
-        var statement = "DELETE FROM game";
+        var statement = "TRUNCATE TABLE game";
         try (Connection conn = DatabaseManager.getConnection()) {
             try (var preparedStatement = conn.prepareStatement(statement)) {
                 preparedStatement.executeUpdate();

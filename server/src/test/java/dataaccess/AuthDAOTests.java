@@ -4,7 +4,8 @@ import model.AuthData;
 import org.junit.jupiter.api.*;
 
 @TestMethodOrder(MethodOrderer.OrderAnnotation.class)
-public class AuthDAOTests implements BaseSQLTests{
+public class AuthDAOTests {
+    AuthData newAuth = new AuthData("TestToken", "Bill");
 
     static AuthDAO AUTH_DAO;
 

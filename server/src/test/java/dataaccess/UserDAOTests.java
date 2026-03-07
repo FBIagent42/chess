@@ -4,7 +4,9 @@ import model.UserData;
 import org.junit.jupiter.api.*;
 
 @TestMethodOrder(MethodOrderer.OrderAnnotation.class)
-public class UserDAOTests implements BaseSQLTests {
+public class UserDAOTests {
+    UserData newUser = new UserData("Bill", "myPass", "stuff@gmail.com");
+
 
     static UserDAO USER_DAO = new SQLUserDAO();
 
