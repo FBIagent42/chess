@@ -20,8 +20,10 @@ public class GameService extends Service{
 
         verifyAuth(createGameRequest.authToken());
 
-        GameData game = new GameData(0, null, null, name, new ChessGame());
-        int gameID = gameDAO.createGame(game);
+        ChessGame game = new ChessGame();
+        game.getBoard().resetBoard();
+        GameData gameData = new GameData(0, null, null, name, game);
+        int gameID = gameDAO.createGame(gameData);
 
         return new CreateGameResult(gameID);
     }
