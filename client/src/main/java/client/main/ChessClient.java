@@ -2,6 +2,8 @@ package client.main;
 
 
 
+import model.requests.RegisterRequest;
+import model.resulsts.RegisterResult;
 import ui.State;
 
 import java.util.Arrays;
@@ -12,6 +14,7 @@ import static ui.EscapeSequences.*;
 public class ChessClient {
     private final ServerFacade server;
     private State state = State.LOGGED_OUT;
+    private String auth;
 
     public ChessClient(String serverUrl){
         server = new ServerFacade(serverUrl);
@@ -189,6 +192,13 @@ public class ChessClient {
 
     public String register(String... params){
         if(params.length == 3){
+            try{
+                RegisterRequest request = new RegisterRequest(params[0], params[1], params[2]);
+                RegisterResult result = server.register(request);
+                auth = result.authToken();
+            } catch (ResponseException e) {
+                return SET_TEXT_COLOR_RED + e.getMessage() + "\n";
+            }
             state = State.LOGGED_IN;
             String username = params[0];
             return RESET + String.format("You registered as %s\n.", username);
