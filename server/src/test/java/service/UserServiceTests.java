@@ -7,11 +7,11 @@ import org.junit.jupiter.api.AfterEach;
 import org.junit.jupiter.api.Assertions;
 import org.junit.jupiter.api.Test;
 import org.mindrot.jbcrypt.BCrypt;
-import service.requests.LoginRequest;
-import service.requests.LogoutRequest;
-import service.requests.RegisterRequest;
-import service.resulsts.LoginResult;
-import service.resulsts.RegisterResult;
+import model.requests.LoginRequest;
+import model.requests.LogoutRequest;
+import model.requests.RegisterRequest;
+import model.resulsts.LoginResult;
+import model.resulsts.RegisterResult;
 import service.serviceexceptions.AlreadyTakenException;
 import service.serviceexceptions.UnauthorizedException;
 

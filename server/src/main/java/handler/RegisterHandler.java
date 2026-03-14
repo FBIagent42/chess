@@ -5,8 +5,8 @@ import dataaccess.DataAccessException;
 import io.javalin.http.Context;
 import io.javalin.http.Handler;
 import org.jetbrains.annotations.NotNull;
-import service.requests.RegisterRequest;
-import service.resulsts.RegisterResult;
+import model.requests.RegisterRequest;
+import model.resulsts.RegisterResult;
 import service.serviceexceptions.AlreadyTakenException;
 import service.servieimplimentation.UserService;
 

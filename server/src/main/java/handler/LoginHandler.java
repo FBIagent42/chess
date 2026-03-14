@@ -5,8 +5,8 @@ import dataaccess.DataAccessException;
 import io.javalin.http.Context;
 import io.javalin.http.Handler;
 import org.jetbrains.annotations.NotNull;
-import service.requests.LoginRequest;
-import service.resulsts.LoginResult;
+import model.requests.LoginRequest;
+import model.resulsts.LoginResult;
 import service.serviceexceptions.UnauthorizedException;
 import service.servieimplimentation.UserService;
 

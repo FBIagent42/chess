@@ -1,4 +1,4 @@
-package service.resulsts;
+package model.resulsts;
 
 import model.GameData;
 import java.util.Collection;

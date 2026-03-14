@@ -1,4 +1,4 @@
-package exception;
+package client.main;
 
 import com.google.gson.Gson;
 

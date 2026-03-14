@@ -3,11 +3,11 @@ package service.servieimplimentation;
 import chess.ChessGame;
 import dataaccess.DataAccessException;
 import model.GameData;
-import service.requests.CreateGameRequest;
-import service.requests.JoinGameRequest;
-import service.requests.ListGamesRequest;
-import service.resulsts.CreateGameResult;
-import service.resulsts.ListGamesResult;
+import model.requests.CreateGameRequest;
+import model.requests.JoinGameRequest;
+import model.requests.ListGamesRequest;
+import model.resulsts.CreateGameResult;
+import model.resulsts.ListGamesResult;
 import service.serviceexceptions.*;
 
 public class GameService extends Service{

@@ -5,8 +5,8 @@ import dataaccess.DataAccessException;
 import io.javalin.http.Context;
 import io.javalin.http.Handler;
 import org.jetbrains.annotations.NotNull;
-import service.requests.CreateGameRequest;
-import service.resulsts.CreateGameResult;
+import model.requests.CreateGameRequest;
+import model.resulsts.CreateGameResult;
 import service.serviceexceptions.UnauthorizedException;
 import service.servieimplimentation.GameService;
 
