@@ -2,7 +2,9 @@ package client.main;
 
 
 
+import model.requests.LoginRequest;
 import model.requests.RegisterRequest;
+import model.resulsts.LoginResult;
 import model.resulsts.RegisterResult;
 import ui.State;
 
@@ -37,6 +39,8 @@ public class ChessClient {
                     case IN_GAME -> result = inGameEval(line);
                 }
                 System.out.print(SET_TEXT_COLOR_BLUE + result);
+            } catch (ResponseException e) {
+                System.out.print(e.getMessage());
             } catch (Throwable e) {
                 var msg = e.toString();
                 System.out.print(msg);
@@ -177,7 +181,7 @@ public class ChessClient {
         }
     }
 
-    public String loggedOutEval(String input) {
+    public String loggedOutEval(String input) throws ResponseException {
         String[] tokens = input.toLowerCase().split(" ");
         String cmd = (tokens.length > 0) ? tokens[0] : "help";
         String[] params = Arrays.copyOfRange(tokens, 1, tokens.length);
@@ -190,14 +194,14 @@ public class ChessClient {
         };
     }
 
-    public String register(String... params){
+    public String register(String... params) throws ResponseException {
         if(params.length == 3){
             try{
                 RegisterRequest request = new RegisterRequest(params[0], params[1], params[2]);
                 RegisterResult result = server.register(request);
                 auth = result.authToken();
             } catch (ResponseException e) {
-                return SET_TEXT_COLOR_RED + e.getMessage() + "\n";
+                throw ResponseException.printCode(e);
             }
             state = State.LOGGED_IN;
             String username = params[0];
@@ -210,8 +214,15 @@ public class ChessClient {
         }
     }
 
-    public String login(String... params){
+    public String login(String... params) throws ResponseException {
         if (params.length == 2) {
+            try{
+                LoginRequest request = new LoginRequest(params[0], params[1]);
+                LoginResult result = server.login(request);
+                auth = result.authToken();
+            } catch (ResponseException e) {
+                throw ResponseException.printCode(e);
+            }
             state = State.LOGGED_IN;
             String username = params[0];
             return RESET + String.format("You logged in as %s.\n", username);

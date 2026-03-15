@@ -1,7 +1,9 @@
 package client.main;
 
 import com.google.gson.Gson;
+import model.requests.LoginRequest;
 import model.requests.RegisterRequest;
+import model.resulsts.LoginResult;
 import model.resulsts.RegisterResult;
 
 import java.net.URI;
@@ -21,6 +23,12 @@ public class ServerFacade {
         var request = buildRequest("POST", "/user", registerRequest , null);
         var response = sendRequest(request);
         return handleResponse(response, RegisterResult.class);
+    }
+
+    public LoginResult login(LoginRequest loginRequest) throws ResponseException {
+        var request = buildRequest("POST", "/session", loginRequest , null);
+        var response = sendRequest(request);
+        return handleResponse(response, LoginResult.class);
     }
 
 

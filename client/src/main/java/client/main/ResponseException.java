@@ -5,6 +5,8 @@ import com.google.gson.Gson;
 import java.util.HashMap;
 import java.util.Map;
 
+import static ui.EscapeSequences.SET_TEXT_COLOR_RED;
+
 public class ResponseException extends Exception {
 
 
@@ -28,6 +30,10 @@ public class ResponseException extends Exception {
             message = map.get("title") + ": " + map.get("details");
         }
         return message;
+    }
+
+    public static ResponseException printCode(ResponseException e){
+        return new ResponseException(e.code(), SET_TEXT_COLOR_RED + e.getMessage() + "\n");
     }
 
     public int code() {
