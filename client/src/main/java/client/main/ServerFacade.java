@@ -2,6 +2,7 @@ package client.main;
 
 import com.google.gson.Gson;
 import model.requests.LoginRequest;
+import model.requests.LogoutRequest;
 import model.requests.RegisterRequest;
 import model.resulsts.LoginResult;
 import model.resulsts.RegisterResult;
@@ -31,6 +32,11 @@ public class ServerFacade {
         return handleResponse(response, LoginResult.class);
     }
 
+    public void logout(LogoutRequest logoutRequest) throws ResponseException {
+        var request = buildRequest("DELETE", "/session", logoutRequest , logoutRequest.authToken());
+        var response = sendRequest(request);
+        handleResponse(response, null);
+    }
 
 
     private HttpRequest buildRequest(String method, String path, Object body, String auth) {

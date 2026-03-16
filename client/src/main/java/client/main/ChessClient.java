@@ -3,6 +3,7 @@ package client.main;
 
 
 import model.requests.LoginRequest;
+import model.requests.LogoutRequest;
 import model.requests.RegisterRequest;
 import model.resulsts.LoginResult;
 import model.resulsts.RegisterResult;
@@ -116,7 +117,7 @@ public class ChessClient {
         }
     }
 
-    public String loggedInEval(String input){
+    public String loggedInEval(String input) throws ResponseException {
         String[] tokens = input.toLowerCase().split(" ");
         String cmd = (tokens.length > 0) ? tokens[0] : "help";
         String[] params = Arrays.copyOfRange(tokens, 1, tokens.length);
@@ -131,7 +132,12 @@ public class ChessClient {
         };
     }
 
-    public String logout(){
+    public String logout() throws ResponseException {
+        try {
+            server.logout(new LogoutRequest(auth));
+        } catch (ResponseException e) {
+            throw ResponseException.printCode(e);
+        }
         state = State.LOGGED_OUT;
         return RESET + "You have been logged out\n";
     }
