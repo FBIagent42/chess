@@ -4,15 +4,12 @@ package client.main;
 
 import model.GameData;
 import model.requests.*;
-import model.resulsts.CreateGameResult;
-import model.resulsts.ListGamesResult;
 import model.resulsts.LoginResult;
 import model.resulsts.RegisterResult;
 import ui.State;
 
 import java.util.Arrays;
 import java.util.Collection;
-import java.util.List;
 import java.util.Scanner;
 
 import static ui.EscapeSequences.*;
@@ -158,7 +155,7 @@ public class ChessClient {
         }
     }
 
-    public String join(String... params){
+    public String join(String... params) throws ResponseException {
         if(params.length < 2) {
             return SET_TEXT_COLOR_RED + "needed more params\n";
         }
@@ -166,14 +163,17 @@ public class ChessClient {
             return SET_TEXT_COLOR_RED + "Color must be White or Black\n";
         }
         if(params.length == 2){
+            int gameID;
             try{
                 try {
-                    int gameID = Integer.parseInt(params[0]);
+                    gameID = Integer.parseInt(params[0]);
                 } catch (NumberFormatException e) {
-                    throw new ResponseException("Invalid number: " + gameID);
+                    throw new ResponseException(400, "Invalid number: " + params[0]);
                 }
-
                 JoinGameRequest request = new JoinGameRequest(auth,params[1], gameID);
+                server.joinGame(request);
+            } catch (ResponseException e) {
+                throw ResponseException.printCode(e);
             }
             state = State.IN_GAME;
             String id = params[0];
@@ -188,9 +188,8 @@ public class ChessClient {
         try{
             ListGamesRequest request = new ListGamesRequest(auth);
             Collection<GameData> games = server.listGames(request).games();
-            int i = 1;
             for(GameData data: games){
-                gameList.append(i++)
+                gameList.append(data.gameID())
                         .append(".  Game Name: ")
                         .append(data.gameName())
                         .append("   White: ")
@@ -202,7 +201,7 @@ public class ChessClient {
         } catch (ResponseException e) {
             throw ResponseException.printCode(e);
         }
-        return RESET + gameList.toString();
+        return RESET + gameList;
     }
 
     public String createGame(String... params){
