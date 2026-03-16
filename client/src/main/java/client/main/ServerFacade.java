@@ -1,9 +1,9 @@
 package client.main;
 
 import com.google.gson.Gson;
-import model.requests.LoginRequest;
-import model.requests.LogoutRequest;
-import model.requests.RegisterRequest;
+import model.requests.*;
+import model.resulsts.CreateGameResult;
+import model.resulsts.ListGamesResult;
 import model.resulsts.LoginResult;
 import model.resulsts.RegisterResult;
 
@@ -38,6 +38,23 @@ public class ServerFacade {
         handleResponse(response, null);
     }
 
+    public ListGamesResult listGames(ListGamesRequest listGamesRequest) throws ResponseException {
+        var request = buildRequest("GET", "/game", listGamesRequest , listGamesRequest.authToken());
+        var response = sendRequest(request);
+        return handleResponse(response, ListGamesResult.class);
+    }
+
+    public CreateGameResult createGame(CreateGameRequest createGameRequest) throws ResponseException {
+        var request = buildRequest("POST", "/game", createGameRequest , createGameRequest.authToken());
+        var response = sendRequest(request);
+        return handleResponse(response, CreateGameResult.class);
+    }
+
+    public void joinGame(JoinGameRequest joinGameRequest) throws ResponseException {
+        var request = buildRequest("POST", "/game", joinGameRequest , joinGameRequest.authToken());
+        var response = sendRequest(request);
+        handleResponse(response, null);
+    }
 
     private HttpRequest buildRequest(String method, String path, Object body, String auth) {
         var request = HttpRequest.newBuilder()

@@ -2,14 +2,17 @@ package client.main;
 
 
 
-import model.requests.LoginRequest;
-import model.requests.LogoutRequest;
-import model.requests.RegisterRequest;
+import model.GameData;
+import model.requests.*;
+import model.resulsts.CreateGameResult;
+import model.resulsts.ListGamesResult;
 import model.resulsts.LoginResult;
 import model.resulsts.RegisterResult;
 import ui.State;
 
 import java.util.Arrays;
+import java.util.Collection;
+import java.util.List;
 import java.util.Scanner;
 
 import static ui.EscapeSequences.*;
@@ -163,6 +166,15 @@ public class ChessClient {
             return SET_TEXT_COLOR_RED + "Color must be White or Black\n";
         }
         if(params.length == 2){
+            try{
+                try {
+                    int gameID = Integer.parseInt(params[0]);
+                } catch (NumberFormatException e) {
+                    throw new ResponseException("Invalid number: " + gameID);
+                }
+
+                JoinGameRequest request = new JoinGameRequest(auth,params[1], gameID);
+            }
             state = State.IN_GAME;
             String id = params[0];
             String color = params[1];
@@ -171,14 +183,39 @@ public class ChessClient {
         return SET_TEXT_COLOR_RED + "Too many params\n";
     }
 
-    public String listGames(){
-        return RESET + "Here is a bunch of games\n";
+    public String listGames() throws ResponseException {
+        StringBuilder gameList = new StringBuilder();
+        try{
+            ListGamesRequest request = new ListGamesRequest(auth);
+            Collection<GameData> games = server.listGames(request).games();
+            int i = 1;
+            for(GameData data: games){
+                gameList.append(i++)
+                        .append(".  Game Name: ")
+                        .append(data.gameName())
+                        .append("   White: ")
+                        .append(data.whiteUsername())
+                        .append("   Black: ")
+                        .append(data.blackUsername())
+                        .append("\n");
+            }
+        } catch (ResponseException e) {
+            throw ResponseException.printCode(e);
+        }
+        return RESET + gameList.toString();
     }
 
     public String createGame(String... params){
-        if(params.length == 1){
+        if(params.length == 1) {
+            int gameID;
+            try {
+                CreateGameRequest request = new CreateGameRequest(params[0], auth);
+                gameID = server.createGame(request).gameID();
+            } catch (ResponseException e) {
+                throw new RuntimeException(e);
+            }
             String name = params[0];
-            return RESET + String.format("You created a game named %s\n.", name);
+            return RESET + String.format("You created a game named %s with ID %s\n.", name, gameID);
         }
         if(params.length < 1) {
             return SET_TEXT_COLOR_RED + "needed more params\n";
