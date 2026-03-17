@@ -2,6 +2,9 @@ package client.main;
 
 
 
+import chess.ChessGame;
+import chess.ChessPiece;
+import chess.ChessPosition;
 import model.GameData;
 import model.requests.*;
 import model.resulsts.LoginResult;
@@ -10,6 +13,7 @@ import ui.State;
 
 import java.util.Arrays;
 import java.util.Collection;
+import java.util.Collections;
 import java.util.Scanner;
 
 import static ui.EscapeSequences.*;
@@ -18,6 +22,13 @@ public class ChessClient {
     private final ServerFacade server;
     private State state = State.LOGGED_OUT;
     private String auth;
+    private GameData game;
+    private String username;
+    private static final String BACKGROUND = SET_TEXT_COLOR_BLACK + SET_BG_COLOR_DARK_GREY;
+    private static final String WHITE_SPACE = SET_BG_COLOR_LIGHTER_GREY;
+    private static final String BLACK_SPACE = SET_BG_COLOR_BLACK;
+    private static final String WHITE_PIECE = SET_TEXT_COLOR_DARK_PURPLE;
+    private static final String BLACK_PIECE = SET_TEXT_COLOR_RED;
 
     public ChessClient(String serverUrl){
         server = new ServerFacade(serverUrl);
@@ -138,14 +149,27 @@ public class ChessClient {
         } catch (ResponseException e) {
             throw ResponseException.printCode(e);
         }
+        username = null;
         state = State.LOGGED_OUT;
         return RESET + "You have been logged out\n";
     }
 
-    public String observe(String... params){
+    public String observe(String... params) throws ResponseException {
         if(params.length == 1){
-            state = State.IN_GAME;
             String id = params[0];
+            try {
+                int gameID = Integer.parseInt(params[0]);
+                Collection<GameData> games = server.listGames(new ListGamesRequest(auth)).games();
+                for (GameData data : games) {
+                    if (data.gameID() == gameID) {
+                        game = data;
+                    }
+                }
+            } catch (NumberFormatException e) {
+                throw new ResponseException(400, SET_TEXT_COLOR_RED + "Invalid number: " + params[0]);
+            }
+            state = State.IN_GAME;
+            drawBoard();
             return RESET + String.format("You are observing game #%s\n.", id);
         }
         if(params.length < 1) {
@@ -170,14 +194,21 @@ public class ChessClient {
                 } catch (NumberFormatException e) {
                     throw new ResponseException(400, "Invalid number: " + params[0]);
                 }
-                JoinGameRequest request = new JoinGameRequest(auth,params[1], gameID);
+                JoinGameRequest request = new JoinGameRequest(auth, params[1], gameID);
                 server.joinGame(request);
+                Collection<GameData> games = server.listGames(new ListGamesRequest(auth)).games();
+                for(GameData data: games){
+                    if(data.gameID() == gameID){
+                        game = data;
+                    }
+                }
             } catch (ResponseException e) {
                 throw ResponseException.printCode(e);
             }
             state = State.IN_GAME;
             String id = params[0];
             String color = params[1];
+            drawBoard();
             return RESET + String.format("You join game #%s as %s\n.", id, color);
         }
         return SET_TEXT_COLOR_RED + "Too many params\n";
@@ -246,7 +277,7 @@ public class ChessClient {
                 throw ResponseException.printCode(e);
             }
             state = State.LOGGED_IN;
-            String username = params[0];
+            username = params[0];
             return RESET + String.format("You registered as %s\n.", username);
         }
         if(params.length < 3) {
@@ -266,7 +297,7 @@ public class ChessClient {
                 throw ResponseException.printCode(e);
             }
             state = State.LOGGED_IN;
-            String username = params[0];
+            username = params[0];
             return RESET + String.format("You logged in as %s.\n", username);
         }
         if(params.length < 2) {
@@ -301,5 +332,67 @@ public class ChessClient {
                 SET_TEXT_COLOR_BLUE + "resign " + RESET + "-resign from game\n" +
                 SET_TEXT_COLOR_BLUE + "help " + RESET + "-list possible commands\n" +
                 SET_TEXT_COLOR_BLUE + "leave " + RESET + "-leave current game\n";
+    }
+
+    private void drawBoard(){
+        String[] numbers = {"8","7","6","5","4","3","2","1"};
+        int color = 1;
+        ChessPiece piece;
+        if(game.blackUsername() != null && game.blackUsername().equals(username)){
+            Collections.reverse(Arrays.asList(numbers));
+        }
+        drawHeader();
+        for(int row = 1; row <= 8; row++){
+            System.out.print(BACKGROUND + " " + numbers[row - 1] + " ");
+            for(int col = 1; col <= 8; col++){
+                piece = game.game().getBoard().getPiece(new ChessPosition(row, col));
+                if(color == 1){
+                    System.out.print(WHITE_SPACE);
+                } else{
+                    System.out.print(BLACK_SPACE);
+                }
+                color *= -1;
+                System.out.print(getPiece(piece));
+            }
+            color *= -1;
+            System.out.println(BACKGROUND + " " + numbers[row - 1] + " " + RESET);
+        }
+    }
+
+    private void drawHeader(){
+        String[] letters = {"a","b","c","d","e","f","g","h"};
+        if(game.blackUsername() != null && game.blackUsername().equals(username)){
+            Collections.reverse(Arrays.asList(letters));
+        }
+
+        StringBuilder header = new StringBuilder().append(BACKGROUND + "   ");
+        for(String letter: letters){
+            header.append(" ")
+                    .append(letter)
+                    .append(" ");
+        }
+        header.append("   " + RESET);
+        System.out.println(header);
+    }
+
+    private String getPiece(ChessPiece piece){
+        if(piece == null){
+            return EMPTY;
+        }
+        String background;
+        if(piece.getTeamColor() == ChessGame.TeamColor.WHITE){
+            background = WHITE_PIECE;
+        } else{
+            background = BLACK_PIECE;
+        }
+        return background + switch (piece.toString().toLowerCase()){
+            case "k" -> BLACK_KING;
+            case "q" -> BLACK_QUEEN;
+            case "r" -> BLACK_ROOK;
+            case "b" -> BLACK_BISHOP;
+            case "n" -> BLACK_KNIGHT;
+            case "p" -> BLACK_PAWN;
+            default -> " ";
+        };
     }
 }
