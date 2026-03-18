@@ -12,10 +12,7 @@ import model.resulsts.LoginResult;
 import model.resulsts.RegisterResult;
 import ui.State;
 
-import java.util.Arrays;
-import java.util.Collection;
-import java.util.Collections;
-import java.util.Scanner;
+import java.util.*;
 
 import static ui.EscapeSequences.*;
 
@@ -26,6 +23,7 @@ public class ChessClient {
     private GameData game;
     private String username;
     private String team;
+    private final HashMap<Integer, Integer> gameMap = new HashMap<>();
     private static final String BACKGROUND = SET_TEXT_COLOR_BLACK + SET_BG_COLOR_DARK_GREY;
     private static final String WHITE_SPACE = SET_BG_COLOR_LIGHTER_GREY;
     private static final String BLACK_SPACE = SET_BG_COLOR_BLACK;
@@ -197,6 +195,9 @@ public class ChessClient {
                 } catch (NumberFormatException e) {
                     throw new ResponseException(400, "Invalid number: " + params[0]);
                 }
+                if(gameMap.containsKey(gameID)){
+                    gameID = gameMap.get(gameID);
+                }
                 JoinGameRequest request = new JoinGameRequest(auth, params[1], gameID);
                 server.joinGame(request);
                 Collection<GameData> games = server.listGames(new ListGamesRequest(auth)).games();
@@ -227,8 +228,10 @@ public class ChessClient {
         try{
             ListGamesRequest request = new ListGamesRequest(auth);
             Collection<GameData> games = server.listGames(request).games();
+            int i = 1;
+            gameMap.clear();
             for(GameData data: games){
-                gameList.append(data.gameID())
+                gameList.append(i)
                         .append(".  Game Name: ")
                         .append(data.gameName())
                         .append("   White: ")
@@ -236,6 +239,8 @@ public class ChessClient {
                         .append("   Black: ")
                         .append(data.blackUsername())
                         .append("\n");
+                gameMap.put(i, data.gameID());
+                i++;
             }
         } catch (ResponseException e) {
             throw ResponseException.printCode(e);
