@@ -16,14 +16,14 @@ public class ServerFacadeTests {
 
     private static Server server;
     static ServerFacade facade;
-    static String serverUrl = "http://localhost:8080";
+    static String serverUrl = "http://localhost:";
 
     @BeforeAll
     public static void init() {
         server = new Server();
         var port = server.run(0);
         System.out.println("Started test HTTP server on " + port);
-        facade = new ServerFacade(serverUrl);
+        facade = new ServerFacade(serverUrl + port);
     }
 
     @AfterAll
