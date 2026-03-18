@@ -2,6 +2,7 @@ package client.main;
 
 
 
+import chess.ChessBoard;
 import chess.ChessGame;
 import chess.ChessPiece;
 import chess.ChessPosition;
@@ -24,6 +25,7 @@ public class ChessClient {
     private String auth;
     private GameData game;
     private String username;
+    private String team;
     private static final String BACKGROUND = SET_TEXT_COLOR_BLACK + SET_BG_COLOR_DARK_GREY;
     private static final String WHITE_SPACE = SET_BG_COLOR_LIGHTER_GREY;
     private static final String BLACK_SPACE = SET_BG_COLOR_BLACK;
@@ -169,6 +171,7 @@ public class ChessClient {
                 throw new ResponseException(400, SET_TEXT_COLOR_RED + "Invalid number: " + params[0]);
             }
             state = State.IN_GAME;
+            team = "white";
             drawBoard();
             return RESET + String.format("You are observing game #%s\n.", id);
         }
@@ -208,6 +211,11 @@ public class ChessClient {
             state = State.IN_GAME;
             String id = params[0];
             String color = params[1];
+            if(color.equals("white")){
+                team = color;
+            } else{
+                team = "black";
+            }
             drawBoard();
             return RESET + String.format("You join game #%s as %s\n.", id, color);
         }
@@ -335,17 +343,27 @@ public class ChessClient {
     }
 
     private void drawBoard(){
+        drawHeader();
+        drawSquares();
+        drawHeader();
+    }
+
+    private void drawSquares(){
         String[] numbers = {"8","7","6","5","4","3","2","1"};
         int color = 1;
         ChessPiece piece;
-        if(game.blackUsername() != null && game.blackUsername().equals(username)){
+        ChessBoard board = game.game().getBoard();
+        int start = 1;
+        int way = 1;
+        if(team != null && team.equals("black")){
             Collections.reverse(Arrays.asList(numbers));
+            start = 8;
+            way = -1;
         }
-        drawHeader();
-        for(int row = 1; row <= 8; row++){
+        for(int row = start; row <= 8 && row >= 1; row += way){
             System.out.print(BACKGROUND + " " + numbers[row - 1] + " ");
-            for(int col = 1; col <= 8; col++){
-                piece = game.game().getBoard().getPiece(new ChessPosition(row, col));
+            for(int col = start; col <= 8 && col >= 1; col += way){
+                piece = board.getPiece(new ChessPosition(row, col));
                 if(color == 1){
                     System.out.print(WHITE_SPACE);
                 } else{
@@ -360,8 +378,9 @@ public class ChessClient {
     }
 
     private void drawHeader(){
-        String[] letters = {"a","b","c","d","e","f","g","h"};
-        if(game.blackUsername() != null && game.blackUsername().equals(username)){
+        String[] letters = { "ａ", "ｂ", "ｃ", "ｄ", "ｅ", "ｆ", "ｇ", "ｈ" };
+
+        if(team != null && team.equals("black")){
             Collections.reverse(Arrays.asList(letters));
         }
 
