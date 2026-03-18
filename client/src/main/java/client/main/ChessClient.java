@@ -100,9 +100,9 @@ public class ChessClient {
             return RESET + String.format("List of possible moves for piece at %s", piece);
         }
         if(params.length < 1) {
-            return SET_TEXT_COLOR_RED + "needed more params\n";
+            return SET_TEXT_COLOR_RED + "Not enough inputs, requires: <Position>\n";
         } else {
-            return SET_TEXT_COLOR_RED + "Too many params\n";
+            return SET_TEXT_COLOR_RED + "Too many inputs\n";
         }
     }
 
@@ -122,9 +122,9 @@ public class ChessClient {
             return RESET + String.format("moved piece from %s to %s.", start, end);
         }
         if(params.length < 2) {
-            return SET_TEXT_COLOR_RED + "needed more params\n";
+            return SET_TEXT_COLOR_RED + "Not enough inputs, requires: <Start> <End> <optional Promotion>\n";
         } else {
-            return SET_TEXT_COLOR_RED + "Too many params\n";
+            return SET_TEXT_COLOR_RED + "Too many inputs\n";
         }
     }
 
@@ -174,17 +174,17 @@ public class ChessClient {
             return RESET + String.format("You are observing game #%s\n.", id);
         }
         if(params.length < 1) {
-            return SET_TEXT_COLOR_RED + "needed more params\n";
+            return SET_TEXT_COLOR_RED + "Not enough inputs, requires: <gameID>\n";
         } else {
-            return SET_TEXT_COLOR_RED + "Too many params\n";
+            return SET_TEXT_COLOR_RED + "Too many inputs\n";
         }
     }
 
     public String join(String... params) throws ResponseException {
         if(params.length < 2) {
-            return SET_TEXT_COLOR_RED + "needed more params\n";
+            return SET_TEXT_COLOR_RED + "\"Not enough inputs, requires: <gameID> [white/black]\n";
         }
-         if (!params[1].equals("white") && !params[1].equals("black")) {
+         if (!params[1].equalsIgnoreCase("white") && !params[1].equalsIgnoreCase("black")) {
             return SET_TEXT_COLOR_RED + "Color must be White or Black\n";
         }
         if(params.length == 2){
@@ -198,7 +198,7 @@ public class ChessClient {
                 if(gameMap.containsKey(gameID)){
                     gameID = gameMap.get(gameID);
                 }
-                JoinGameRequest request = new JoinGameRequest(auth, params[1], gameID);
+                JoinGameRequest request = new JoinGameRequest(auth, params[1].toLowerCase(), gameID);
                 server.joinGame(request);
                 Collection<GameData> games = server.listGames(new ListGamesRequest(auth)).games();
                 for(GameData data: games){
@@ -220,7 +220,7 @@ public class ChessClient {
             drawBoard();
             return RESET + String.format("You join game #%s as %s\n.", id, color);
         }
-        return SET_TEXT_COLOR_RED + "Too many params\n";
+        return SET_TEXT_COLOR_RED + "Too many inputs\n";
     }
 
     public String listGames() throws ResponseException {
@@ -231,13 +231,25 @@ public class ChessClient {
             int i = 1;
             gameMap.clear();
             for(GameData data: games){
+                String whiteUser;
+                String blackUser;
+                if(data.whiteUsername() == null){
+                    whiteUser = "Open";
+                } else{
+                    whiteUser = data.whiteUsername();
+                }
+                if(data.blackUsername() == null){
+                    blackUser = "Open";
+                } else{
+                    blackUser = data.blackUsername();
+                }
                 gameList.append(i)
                         .append(".  Game Name: ")
                         .append(data.gameName())
                         .append("   White: ")
-                        .append(data.whiteUsername())
+                        .append(whiteUser)
                         .append("   Black: ")
-                        .append(data.blackUsername())
+                        .append(blackUser)
                         .append("\n");
                 gameMap.put(i, data.gameID());
                 i++;
@@ -261,9 +273,9 @@ public class ChessClient {
             return RESET + String.format("You created a game named %s with ID %s\n.", name, gameID);
         }
         if(params.length < 1) {
-            return SET_TEXT_COLOR_RED + "needed more params\n";
+            return SET_TEXT_COLOR_RED + "\"Not enough inputs, requires: <gameName>\n";
         }else {
-            return SET_TEXT_COLOR_RED + "Too many params\n";
+            return SET_TEXT_COLOR_RED + "Too many inputs\n";
         }
     }
 
@@ -294,9 +306,9 @@ public class ChessClient {
             return RESET + String.format("You registered as %s\n.", username);
         }
         if(params.length < 3) {
-            return SET_TEXT_COLOR_RED + "needed more params\n";
+            return SET_TEXT_COLOR_RED + "\"Not enough inputs, requires: <Username> <Password> <Email>\n";
         }else {
-            return SET_TEXT_COLOR_RED + "Too many params\n";
+            return SET_TEXT_COLOR_RED + "Too many inputs\n";
         }
     }
 
@@ -314,9 +326,9 @@ public class ChessClient {
             return RESET + String.format("You logged in as %s.\n", username);
         }
         if(params.length < 2) {
-            return SET_TEXT_COLOR_RED + "needed more params\n";
+            return SET_TEXT_COLOR_RED + "\"Not enough inputs, requires: <Username> <Password>\n";
         }else {
-            return SET_TEXT_COLOR_RED + "Too many params\n";
+            return SET_TEXT_COLOR_RED + "Too many inputs\n";
         }
     }
 
@@ -334,7 +346,7 @@ public class ChessClient {
         } else if (state == State.LOGGED_IN) {
             return SET_TEXT_COLOR_BLUE + "create <Game Name> " + RESET + "-create new game\n" +
                     SET_TEXT_COLOR_BLUE + "list " + RESET + "-list current games\n" +
-                    SET_TEXT_COLOR_BLUE + "join <Game ID> [White/Black] " + RESET + "-join game as color\n" +
+                    SET_TEXT_COLOR_BLUE + "join <Game ID> [white/black] " + RESET + "-join game as color\n" +
                     SET_TEXT_COLOR_BLUE + "observe <Game ID> " + RESET + "-observe current game\n" +
                     SET_TEXT_COLOR_BLUE + "help " + RESET + "-list possible commands\n" +
                     SET_TEXT_COLOR_BLUE + "logout " + RESET + "-logout of server\n";
@@ -361,7 +373,6 @@ public class ChessClient {
         int start = 1;
         int way = 1;
         if(team != null && team.equals("black")){
-            Collections.reverse(Arrays.asList(numbers));
             start = 8;
             way = -1;
         }
