@@ -38,19 +38,19 @@ public class GameService extends Service{
         if(game == null){
             throw(new NoGameException());
         }
-        if((color.equals("black") && game.blackUsername() != null)
-                || (color.equals("white") && game.whiteUsername() != null)){
+        if((color.equalsIgnoreCase("black") && game.blackUsername() != null)
+                || (color.equalsIgnoreCase("white") && game.whiteUsername() != null)){
             throw(new ColorTakenException());
         }
 
-        if(color.equals("white")){
+        if(color.equalsIgnoreCase("white")){
             gameDAO.updateGame(new GameData(game.gameID(),
                     username,
                     game.blackUsername(),
                     game.gameName(),
                     game.game()));
         }
-        if(color.equals("black")){
+        if(color.equalsIgnoreCase("black")){
             gameDAO.updateGame(new GameData(game.gameID(),
                     game.whiteUsername(),
                     username,

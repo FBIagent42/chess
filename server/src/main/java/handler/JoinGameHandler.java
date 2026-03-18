@@ -22,7 +22,7 @@ public class JoinGameHandler implements Handler {
         String body;
 
         if(joinGameRequest.playerColor() == null
-                ||!(joinGameRequest.playerColor().equals("white") || joinGameRequest.playerColor().equals("black"))
+                ||!(joinGameRequest.playerColor().equalsIgnoreCase("white") || joinGameRequest.playerColor().equalsIgnoreCase("black"))
                 || joinGameRequest.gameID() == 0){
             body = new Gson().toJson(Map.of("message", "Error: Bad request."));
             context.status(400)
