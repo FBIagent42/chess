@@ -78,6 +78,8 @@ public class ChessClient {
 
     public String leave(){
         state = State.LOGGED_IN;
+        game = null;
+        team = null;
         return RESET + "You left the game";
     }
 
@@ -87,7 +89,9 @@ public class ChessClient {
     }
 
     public String redraw(){
-        return RESET + "We have redrawn the board";
+        System.out.print("\n\n");
+        drawBoard();
+        return RESET;
     }
 
     public String highlight(String... params){
