@@ -30,9 +30,10 @@ public class Service {
         return UUID.randomUUID().toString();
     }
 
-    void verifyAuth(String authToken) throws DataAccessException {
+    public String verifyAuth(String authToken) throws UnauthorizedException, DataAccessException {
         if(authDAO.getAuth(authToken) == null){
             throw(new UnauthorizedException());
         }
+        return authDAO.getAuth(authToken).username();
     }
 }
