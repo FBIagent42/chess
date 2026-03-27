@@ -66,6 +66,9 @@ public class GameService extends Service{
     }
 
     public String getColor(int gameID, String username) throws DataAccessException {
+        if(gameDAO.getGame(gameID) == null){
+            throw new DataAccessException("No Game with that ID");
+        }
         if(Objects.equals(gameDAO.getGame(gameID).whiteUsername(), username)){
             return "white";
         } else if (Objects.equals(gameDAO.getGame(gameID).blackUsername(), username)) {
@@ -73,5 +76,9 @@ public class GameService extends Service{
         } else {
             return "an observer";
         }
+    }
+
+    public ChessGame getGame(int gameID) throws DataAccessException {
+        return gameDAO.getGame(gameID).game();
     }
 }

@@ -14,6 +14,8 @@ import service.servieimplimentation.GameService;
 import websocket.commands.MakeMoveCommand;
 import websocket.commands.UserGameCommand;
 import org.eclipse.jetty.websocket.api.Session;
+import websocket.messages.ErrorMessage;
+import websocket.messages.LoadGameMessage;
 import websocket.messages.NotificationMessage;
 import websocket.messages.ServerMessage;
 
@@ -34,23 +36,27 @@ public class WebSocketHandler implements WsConnectHandler, WsMessageHandler, WsC
     }
 
     @Override
-    public void handleMessage(WsMessageContext ctx) {
+    public void handleMessage(WsMessageContext ctx) throws IOException {
         int gameID = -1;
         Session session = ctx.session;
         try {
-            UserGameCommand command = new Gson().fromJson(ctx.message(), UserGameCommand.class);
+            MakeMoveCommand command = new Gson().fromJson(ctx.message(), MakeMoveCommand.class);
             gameID = command.getGameID();
             String username = service.verifyAuth(command.getAuthToken());
             switch (command.getCommandType()) {
                 case CONNECT -> connect(ctx.session, username, command);
-                case MAKE_MOVE -> move(ctx.session, username, (MakeMoveCommand) command);
+                case MAKE_MOVE -> move(ctx.session, username, command);
                 case LEAVE -> leave(ctx.session, username, command);
                 case RESIGN -> resign(ctx.session, username, command);
             }
         } catch (IOException ex) {
             ex.printStackTrace();
-        } catch (DataAccessException | InvalidMoveException | UnauthorizedException e) {
+        } catch (DataAccessException | InvalidMoveException e) {
             throw new RuntimeException(e);
+        } catch (UnauthorizedException e){
+            var error = new ErrorMessage("Unauthorized");
+            session.getRemote().sendString(new Gson().toJson(error));
+            return;
         }
     }
 
@@ -60,31 +66,44 @@ public class WebSocketHandler implements WsConnectHandler, WsMessageHandler, WsC
     }
 
     private void move(Session session, String username, MakeMoveCommand command) throws DataAccessException, InvalidMoveException, IOException {
-        service.makeMove(command.getGameID(), command.getMove());
+        int gameID = command.getGameID();
+        service.makeMove(gameID, command.getMove());
         var message = String.format("%s played the %s", username, command.getMove());
-        var notification = new NotificationMessage(ServerMessage.ServerMessageType.NOTIFICATION, message);
-        connections.broadcast(command.getGameID(), notification);
+        var notification = new NotificationMessage(message);
+        var loadGame = new LoadGameMessage(service.getGame(gameID));
+        connections.broadcast(gameID, null, loadGame);
+        connections.broadcast(gameID, session, notification);
     }
 
     private void connect(Session session, String username, UserGameCommand command) throws IOException, DataAccessException {
-        connections.add(command.getGameID(), session);
-        String color = service.getColor(command.getGameID(), username);
+        int gameID = command.getGameID();
+        String color;
+        try {
+            color = service.getColor(gameID, username);
+        } catch (DataAccessException e) {
+            var error = new ErrorMessage("No game with that ID");
+            session.getRemote().sendString(new Gson().toJson(error));
+            return;
+        }
+        connections.add(gameID, session);
         var message = String.format("%s joined the game as %s", username, color);
-        var notification = new NotificationMessage(ServerMessage.ServerMessageType.NOTIFICATION, message);
-        connections.broadcast(command.getGameID(), notification);
+        var notification = new NotificationMessage(message);
+        var loadGame = new LoadGameMessage(service.getGame(gameID));
+        session.getRemote().sendString(new Gson().toJson(loadGame));
+        connections.broadcast(gameID, session, notification);
     }
 
     private void leave(Session session, String username, UserGameCommand command) throws IOException {
         connections.remove(command.getGameID(), session);
         var message = String.format("%s left the game", username);
-        var notification = new NotificationMessage(ServerMessage.ServerMessageType.NOTIFICATION, message);
-        connections.broadcast(command.getGameID(), notification);
+        var notification = new NotificationMessage(message);
+        connections.broadcast(command.getGameID(), session, notification);
     }
 
     private void resign(Session session, String username, UserGameCommand command) throws IOException {
         connections.remove(command.getGameID(), session);
         var message = String.format("%s resigned", username);
-        var notification = new NotificationMessage(ServerMessage.ServerMessageType.NOTIFICATION, message);
-        connections.broadcast(command.getGameID(), notification);
+        var notification = new NotificationMessage(message);
+        connections.broadcast(command.getGameID(),null, notification);
     }
 }

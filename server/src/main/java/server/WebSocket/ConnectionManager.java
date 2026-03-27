@@ -25,11 +25,13 @@ public class ConnectionManager {
 
     }
 
-    public void broadcast(int gameID, ServerMessage notification) throws IOException {
+    public void broadcast(int gameID, Session excludeSession, ServerMessage notification) throws IOException {
         String msg = new Gson().toJson(notification);
         for (Session c : connections.get(gameID)) {
             if (c.isOpen()) {
-                c.getRemote().sendString(msg);
+                if (!c.equals(excludeSession)) {
+                    c.getRemote().sendString(msg);
+                }
             }
         }
     }
