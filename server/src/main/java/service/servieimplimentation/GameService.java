@@ -1,6 +1,8 @@
 package service.servieimplimentation;
 
 import chess.ChessGame;
+import chess.ChessMove;
+import chess.InvalidMoveException;
 import dataaccess.DataAccessException;
 import model.GameData;
 import model.requests.CreateGameRequest;
@@ -10,16 +12,15 @@ import model.resulsts.CreateGameResult;
 import model.resulsts.ListGamesResult;
 import service.serviceexceptions.*;
 
+import java.util.Objects;
+
 public class GameService extends Service{
     public ListGamesResult listGames(ListGamesRequest listGamesRequest) throws DataAccessException {
         verifyAuth(listGamesRequest.authToken());
         return new ListGamesResult(gameDAO.listGames());
     }
     public CreateGameResult createGame(CreateGameRequest createGameRequest) throws DataAccessException {
-        String name = createGameRequest.gameName();
-
-        verifyAuth(createGameRequest.authToken());
-
+        String name = verifyAuth(createGameRequest.authToken());
         ChessGame game = new ChessGame();
         game.getBoard().resetBoard();
         GameData gameData = new GameData(0, null, null, name, game);
@@ -28,10 +29,8 @@ public class GameService extends Service{
         return new CreateGameResult(gameID);
     }
     public void joinGame(JoinGameRequest joinGameRequest) throws DataAccessException {
-        verifyAuth(joinGameRequest.authToken());
-
         String color = joinGameRequest.playerColor();
-        String username = authDAO.getAuth(joinGameRequest.authToken()).username();
+        String username = verifyAuth(joinGameRequest.authToken());
 
         GameData game = gameDAO.getGame(joinGameRequest.gameID());
 
@@ -56,6 +55,23 @@ public class GameService extends Service{
                     username,
                     game.gameName(),
                     game.game()));
+        }
+    }
+
+    public void makeMove(int gameID, ChessMove move) throws DataAccessException, InvalidMoveException {
+        GameData data = gameDAO.getGame(gameID);
+        ChessGame game = data.game();
+        game.makeMove(move);
+        gameDAO.updateGame(new GameData(data.gameID(), data.whiteUsername(), data.blackUsername(), data.gameName(), game));
+    }
+
+    public String getColor(int gameID, String username) throws DataAccessException {
+        if(Objects.equals(gameDAO.getGame(gameID).whiteUsername(), username)){
+            return "white";
+        } else if (Objects.equals(gameDAO.getGame(gameID).blackUsername(), username)) {
+            return "black";
+        } else {
+            return "an observer";
         }
     }
 }
