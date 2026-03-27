@@ -1,6 +1,5 @@
 package server.WebSocket;
 
-import chess.ChessMove;
 import chess.InvalidMoveException;
 import com.google.gson.Gson;
 import dataaccess.*;
@@ -10,8 +9,8 @@ import io.javalin.websocket.WsConnectContext;
 import io.javalin.websocket.WsConnectHandler;
 import io.javalin.websocket.WsMessageContext;
 import io.javalin.websocket.WsMessageHandler;
+import service.serviceexceptions.UnauthorizedException;
 import service.servieimplimentation.GameService;
-import service.servieimplimentation.Service;
 import websocket.commands.MakeMoveCommand;
 import websocket.commands.UserGameCommand;
 import org.eclipse.jetty.websocket.api.Session;
@@ -24,11 +23,8 @@ import java.util.Objects;
 
 public class WebSocketHandler implements WsConnectHandler, WsMessageHandler, WsCloseHandler {
 
-    private final GameService service = new Service();
+    private final GameService service = new GameService();
     private final ConnectionManager connections = new ConnectionManager();
-    protected static UserDAO userDAO;
-    protected static AuthDAO authDAO;
-    protected static GameDAO gameDAO;
 
 
     @Override
@@ -47,13 +43,13 @@ public class WebSocketHandler implements WsConnectHandler, WsMessageHandler, WsC
             String username = service.verifyAuth(command.getAuthToken());
             switch (command.getCommandType()) {
                 case CONNECT -> connect(ctx.session, username, command);
-                case MAKE_MOVE -> move(ctx.session, username, command);
+                case MAKE_MOVE -> move(ctx.session, username, (MakeMoveCommand) command);
                 case LEAVE -> leave(ctx.session, username, command);
                 case RESIGN -> resign(ctx.session, username, command);
             }
         } catch (IOException ex) {
             ex.printStackTrace();
-        } catch (DataAccessException e) {
+        } catch (DataAccessException | InvalidMoveException | UnauthorizedException e) {
             throw new RuntimeException(e);
         }
     }
@@ -72,14 +68,7 @@ public class WebSocketHandler implements WsConnectHandler, WsMessageHandler, WsC
 
     private void connect(Session session, String username, UserGameCommand command) throws IOException, DataAccessException {
         connections.add(command.getGameID(), session);
-        String color;
-        if(Objects.equals(gameDAO.getGame(command.getGameID()).whiteUsername(), username)){
-            color = "white";
-        } else if (Objects.equals(gameDAO.getGame(command.getGameID()).blackUsername(), username)) {
-            color = "black";
-        } else {
-            color = "an observer";
-        }
+        String color = service.getColor(command.getGameID(), username);
         var message = String.format("%s joined the game as %s", username, color);
         var notification = new NotificationMessage(ServerMessage.ServerMessageType.NOTIFICATION, message);
         connections.broadcast(command.getGameID(), notification);
