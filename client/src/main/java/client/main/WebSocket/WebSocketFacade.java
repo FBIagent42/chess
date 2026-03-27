@@ -65,14 +65,22 @@ public class WebSocketFacade extends Endpoint {
         }
     }
 
-    public void leavePetShop(String visitorName) throws ResponseException {
+    public void leave(String auth, int gameID) throws ResponseException {
         try {
-            var action = new Action(Action.Type.EXIT, visitorName);
-            this.session.getBasicRemote().sendText(new Gson().toJson(action));
+            var command = new UserGameCommand(UserGameCommand.CommandType.LEAVE, auth, gameID);
+            this.session.getBasicRemote().sendText(new Gson().toJson(command));
         } catch (IOException ex) {
-            throw new ResponseException(ResponseException.Code.ServerError, ex.getMessage());
+            throw new ResponseException(500, ex.getMessage());
         }
     }
 
+    public void resign(String auth, int gameID) throws ResponseException {
+        try {
+            var command = new UserGameCommand(UserGameCommand.CommandType.RESIGN, auth, gameID);
+            this.session.getBasicRemote().sendText(new Gson().toJson(command));
+        } catch (IOException ex) {
+            throw new ResponseException(500, ex.getMessage());
+        }
+    }
 }
 
