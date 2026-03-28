@@ -1,5 +1,6 @@
 package server.WebSocket;
 
+import chess.ChessGame;
 import chess.InvalidMoveException;
 import com.google.gson.Gson;
 import dataaccess.*;
@@ -56,7 +57,6 @@ public class WebSocketHandler implements WsConnectHandler, WsMessageHandler, WsC
         } catch (UnauthorizedException e){
             var error = new ErrorMessage("Unauthorized");
             session.getRemote().sendString(new Gson().toJson(error));
-            return;
         }
     }
 
@@ -67,12 +67,36 @@ public class WebSocketHandler implements WsConnectHandler, WsMessageHandler, WsC
 
     private void move(Session session, String username, MakeMoveCommand command) throws DataAccessException, InvalidMoveException, IOException {
         int gameID = command.getGameID();
-        service.makeMove(gameID, command.getMove());
-        var message = String.format("%s played the %s", username, command.getMove());
+        ChessGame.TeamColor color = service.getGame(gameID).getBoard().getPiece(command.getMove().getStartPosition()).getTeamColor();
+        try {
+            service.makeMove(gameID, command.getMove());
+        } catch (DataAccessException e) {
+            throw new RuntimeException(e);
+        } catch (InvalidMoveException e) {
+            var error = new ErrorMessage("Invalid Move");
+            session.getRemote().sendString(new Gson().toJson(error));
+            return;
+        }
+        ChessGame game = service.getGame(gameID);
+        var message = String.format("%s played the move %s", username, command.getMove());
         var notification = new NotificationMessage(message);
-        var loadGame = new LoadGameMessage(service.getGame(gameID));
+        var loadGame = new LoadGameMessage(game);
         connections.broadcast(gameID, null, loadGame);
         connections.broadcast(gameID, session, notification);
+        color = game.getTeamTurn();
+        if(game.isInCheck(color)){
+            if(game.isInCheckmate(color)){
+                message = String.format("%s is in checkmate", color);
+            } else {
+                message = String.format("%s is in check", color);
+            }
+        } else if (game.isInStalemate(color)) {
+            message = String.format("%s is in stalemate", color);
+        } else{
+            return;
+        }
+        notification = new NotificationMessage(message);
+        connections.broadcast(gameID, null, notification);
     }
 
     private void connect(Session session, String username, UserGameCommand command) throws IOException, DataAccessException {
