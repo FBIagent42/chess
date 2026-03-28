@@ -18,11 +18,9 @@ import org.eclipse.jetty.websocket.api.Session;
 import websocket.messages.ErrorMessage;
 import websocket.messages.LoadGameMessage;
 import websocket.messages.NotificationMessage;
-import websocket.messages.ServerMessage;
 
 
 import java.io.IOException;
-import java.util.Objects;
 
 public class WebSocketHandler implements WsConnectHandler, WsMessageHandler, WsCloseHandler {
 
@@ -67,7 +65,18 @@ public class WebSocketHandler implements WsConnectHandler, WsMessageHandler, WsC
 
     private void move(Session session, String username, MakeMoveCommand command) throws DataAccessException, InvalidMoveException, IOException {
         int gameID = command.getGameID();
-        ChessGame.TeamColor color = service.getGame(gameID).getBoard().getPiece(command.getMove().getStartPosition()).getTeamColor();
+        ChessGame game = service.getGame(gameID);
+        ChessGame.TeamColor color = game.getBoard().getPiece(command.getMove().getStartPosition()).getTeamColor();
+        if(!color.toString().toLowerCase().equals(connections.sessions.get(session))){
+            var error = new ErrorMessage("Not your piece");
+            session.getRemote().sendString(new Gson().toJson(error));
+            return;
+        }
+        if(color != game.getTeamTurn()){
+            var error = new ErrorMessage("Not your turn");
+            session.getRemote().sendString(new Gson().toJson(error));
+            return;
+        }
         try {
             service.makeMove(gameID, command.getMove());
         } catch (DataAccessException e) {
@@ -77,7 +86,7 @@ public class WebSocketHandler implements WsConnectHandler, WsMessageHandler, WsC
             session.getRemote().sendString(new Gson().toJson(error));
             return;
         }
-        ChessGame game = service.getGame(gameID);
+        game = service.getGame(gameID);
         var message = String.format("%s played the move %s", username, command.getMove());
         var notification = new NotificationMessage(message);
         var loadGame = new LoadGameMessage(game);
@@ -109,7 +118,7 @@ public class WebSocketHandler implements WsConnectHandler, WsMessageHandler, WsC
             session.getRemote().sendString(new Gson().toJson(error));
             return;
         }
-        connections.add(gameID, session);
+        connections.add(gameID, session, color);
         var message = String.format("%s joined the game as %s", username, color);
         var notification = new NotificationMessage(message);
         var loadGame = new LoadGameMessage(service.getGame(gameID));
