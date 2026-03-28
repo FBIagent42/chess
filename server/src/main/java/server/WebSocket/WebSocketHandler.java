@@ -66,6 +66,11 @@ public class WebSocketHandler implements WsConnectHandler, WsMessageHandler, WsC
     private void move(Session session, String username, MakeMoveCommand command) throws DataAccessException, InvalidMoveException, IOException {
         int gameID = command.getGameID();
         ChessGame game = service.getGame(gameID);
+        if(game.isGameOver()){
+            var error = new ErrorMessage("Game is Over");
+            session.getRemote().sendString(new Gson().toJson(error));
+            return;
+        }
         ChessGame.TeamColor color = game.getBoard().getPiece(command.getMove().getStartPosition()).getTeamColor();
         if(!color.toString().toLowerCase().equals(connections.sessions.get(session))){
             var error = new ErrorMessage("Not your piece");
@@ -133,8 +138,8 @@ public class WebSocketHandler implements WsConnectHandler, WsMessageHandler, WsC
         connections.broadcast(command.getGameID(), session, notification);
     }
 
-    private void resign(Session session, String username, UserGameCommand command) throws IOException {
-        connections.remove(command.getGameID(), session);
+    private void resign(Session session, String username, UserGameCommand command) throws IOException, DataAccessException {
+        service.gameOver(command.getGameID());
         var message = String.format("%s resigned", username);
         var notification = new NotificationMessage(message);
         connections.broadcast(command.getGameID(),null, notification);

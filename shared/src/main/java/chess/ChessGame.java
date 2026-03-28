@@ -15,6 +15,7 @@ public class ChessGame {
 
     ChessBoard board = new ChessBoard();
     TeamColor turn;
+    boolean gameOver;
     int[] whiteKing;
     int[] blackKing;
 
@@ -23,6 +24,7 @@ public class ChessGame {
         board.resetBoard();
         whiteKing = new int[]{1, 5};
         blackKing = new int[]{8, 5};
+        gameOver = false;
     }
 
     /**
@@ -359,6 +361,13 @@ public class ChessGame {
         }
     }
 
+    public boolean isGameOver() {
+        return gameOver;
+    }
+
+    public void setGameOver(boolean gameOver) {
+        this.gameOver = gameOver;
+    }
 
     @Override
     public boolean equals(Object o) {

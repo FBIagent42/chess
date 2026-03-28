@@ -81,4 +81,11 @@ public class GameService extends Service{
     public ChessGame getGame(int gameID) throws DataAccessException {
         return gameDAO.getGame(gameID).game();
     }
+
+    public void gameOver(int gameID) throws DataAccessException {
+        GameData data = gameDAO.getGame(gameID);
+        ChessGame game =  data.game();
+        game.setGameOver(true);
+        gameDAO.updateGame(new GameData(data.gameID(), data.whiteUsername(), data.blackUsername(), data.gameName(), game));
+    }
 }
