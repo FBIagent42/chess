@@ -68,13 +68,13 @@ public class ChessClient implements NotificationHandler {
     }
 
     public void notify(ServerMessage notification) {
-        drawBoard();
         switch (notification){
             case NotificationMessage message -> System.out.println(RESET + message);
             case ErrorMessage error -> System.out.println(SET_TEXT_COLOR_RED + error);
             case LoadGameMessage gameMessage -> game = gameMessage.getGame();
             default -> System.out.println(SET_TEXT_COLOR_RED + notification);
         }
+        drawBoard();
         printPrompt();
     }
 
@@ -195,7 +195,6 @@ public class ChessClient implements NotificationHandler {
             ws.connect(auth, gameID);
             state = State.IN_GAME;
             team = "white";
-            drawBoard();
             return RESET + String.format("You are observing game #%s\n.", id);
         }
         if(params.length < 1) {
