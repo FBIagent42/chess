@@ -1,7 +1,6 @@
 package server.WebSocket;
 
-import chess.ChessGame;
-import chess.InvalidMoveException;
+import chess.*;
 import com.google.gson.Gson;
 import dataaccess.*;
 import io.javalin.websocket.WsCloseContext;
@@ -72,7 +71,19 @@ public class WebSocketHandler implements WsConnectHandler, WsMessageHandler, WsC
             session.getRemote().sendString(new Gson().toJson(error));
             return;
         }
-        ChessGame.TeamColor color = game.getBoard().getPiece(command.getMove().getStartPosition()).getTeamColor();
+        ChessPosition startPos = command.getMove().getStartPosition();
+        if(startPos.getRow() > 8 | startPos.getRow() < 1 | startPos.getColumn() < 1 | startPos.getColumn() > 8){
+            var error = new ErrorMessage("Invalid move; off the board");
+            session.getRemote().sendString(new Gson().toJson(error));
+            return;
+        }
+        ChessPiece piece = game.getBoard().getPiece(command.getMove().getStartPosition());
+        if(piece == null){
+            var error = new ErrorMessage("No piece at that position");
+            session.getRemote().sendString(new Gson().toJson(error));
+            return;
+        }
+        ChessGame.TeamColor color = piece.getTeamColor();
         if(!color.toString().toLowerCase().equals(connections.sessions.get(session))){
             var error = new ErrorMessage("Not your piece");
             session.getRemote().sendString(new Gson().toJson(error));

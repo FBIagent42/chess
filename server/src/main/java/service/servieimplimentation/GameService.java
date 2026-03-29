@@ -20,7 +20,8 @@ public class GameService extends Service{
         return new ListGamesResult(gameDAO.listGames());
     }
     public CreateGameResult createGame(CreateGameRequest createGameRequest) throws DataAccessException {
-        String name = verifyAuth(createGameRequest.authToken());
+        verifyAuth(createGameRequest.authToken());
+        String name = createGameRequest.gameName();
         ChessGame game = new ChessGame();
         game.getBoard().resetBoard();
         GameData gameData = new GameData(0, null, null, name, game);
@@ -98,7 +99,7 @@ public class GameService extends Service{
         if(Objects.equals(color, "white")){
             gameDAO.updateGame(new GameData(data.gameID(), null, data.blackUsername(), data.gameName(), data.game()));
         } else if(Objects.equals(color, "black")){
-            gameDAO.updateGame(new GameData(data.gameID(), null, data.blackUsername(), data.gameName(), data.game()));
+            gameDAO.updateGame(new GameData(data.gameID(), data.whiteUsername(), null, data.gameName(), data.game()));
         }
     }
 }

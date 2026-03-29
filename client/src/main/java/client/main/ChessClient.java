@@ -2,25 +2,30 @@ package client.main;
 
 
 
-import chess.ChessBoard;
-import chess.ChessGame;
-import chess.ChessPiece;
-import chess.ChessPosition;
+import chess.*;
+import client.main.WebSocket.NotificationHandler;
+import client.main.WebSocket.WebSocketFacade;
 import model.GameData;
 import model.requests.*;
 import model.resulsts.LoginResult;
 import model.resulsts.RegisterResult;
 import ui.State;
+import websocket.messages.ErrorMessage;
+import websocket.messages.LoadGameMessage;
+import websocket.messages.NotificationMessage;
+import websocket.messages.ServerMessage;
 
 import java.util.*;
 
 import static ui.EscapeSequences.*;
 
-public class ChessClient {
+public class ChessClient implements NotificationHandler {
     private final ServerFacade server;
+    private final WebSocketFacade ws;
     private State state = State.LOGGED_OUT;
     private String auth;
-    private GameData game;
+    private ChessGame game;
+    private int gameID;
     private String username;
     private String team;
     private final HashMap<Integer, Integer> gameMap = new HashMap<>();
@@ -30,8 +35,9 @@ public class ChessClient {
     private static final String WHITE_PIECE = SET_TEXT_COLOR_DARK_PURPLE;
     private static final String BLACK_PIECE = SET_TEXT_COLOR_RED;
 
-    public ChessClient(String serverUrl){
+    public ChessClient(String serverUrl) throws ResponseException {
         server = new ServerFacade(serverUrl);
+        ws = new WebSocketFacade(serverUrl, this);
     }
 
     public void run() {
@@ -61,7 +67,18 @@ public class ChessClient {
         System.out.println();
     }
 
-    public String inGameEval(String input){
+    public void notify(ServerMessage notification) {
+        drawBoard();
+        switch (notification){
+            case NotificationMessage message -> System.out.println(RESET + message);
+            case ErrorMessage error -> System.out.println(SET_TEXT_COLOR_RED + error);
+            case LoadGameMessage gameMessage -> game = gameMessage.getGame();
+            default -> System.out.println(SET_TEXT_COLOR_RED + notification);
+        }
+        printPrompt();
+    }
+
+    public String inGameEval(String input) throws ResponseException {
         String[] tokens = input.toLowerCase().split(" ");
         String cmd = (tokens.length > 0) ? tokens[0] : "help";
         String[] params = Arrays.copyOfRange(tokens, 1, tokens.length);
@@ -76,15 +93,16 @@ public class ChessClient {
         };
     }
 
-    public String leave(){
+    public String leave() throws ResponseException {
+        ws.leave(auth, gameID);
         state = State.LOGGED_IN;
         game = null;
         team = null;
         return RESET + "You left the game";
     }
 
-    public String resign(){
-        state = State.LOGGED_IN;
+    public String resign() throws ResponseException {
+        ws.resign(auth, gameID);
         return RESET + "You have resigned";
     }
 
@@ -110,7 +128,7 @@ public class ChessClient {
         }
     }
 
-    public String move(String... params){
+    public String move(String... params) throws ResponseException {
         if(params.length == 2 || params.length == 3){
             String start = params[0];
             String end = params[1];
@@ -120,10 +138,15 @@ public class ChessClient {
             }
             if(params.length == 3){
                 promote = params[2];
+                ChessPiece.PieceType piece = parsePiece(promote);
+                if(piece == null){
+                    return SET_TEXT_COLOR_RED + "Invalid promotion piece. (ex. queen)";
+                }
+                ws.move(auth, gameID, parseMove(start, end, piece));
                 return RESET + String.format("moved pawn from %s to %s promoting to a %s", start, end, promote);
             }
-
-            return RESET + String.format("moved piece from %s to %s.", start, end);
+            ws.move(auth, gameID, parseMove(start, end, null));
+            return RESET;
         }
         if(params.length < 2) {
             return SET_TEXT_COLOR_RED + "Not enough inputs, requires: <Start> <End> <optional Promotion>\n";
@@ -162,16 +185,14 @@ public class ChessClient {
         if(params.length == 1){
             String id = params[0];
             try {
-                int gameID = Integer.parseInt(params[0]);
-                Collection<GameData> games = server.listGames(new ListGamesRequest(auth)).games();
-                for (GameData data : games) {
-                    if (data.gameID() == gameID) {
-                        game = data;
-                    }
+                gameID = Integer.parseInt(params[0]);
+                if(gameMap.containsKey(gameID)){
+                    gameID = gameMap.get(gameID);
                 }
             } catch (NumberFormatException e) {
                 throw new ResponseException(400, SET_TEXT_COLOR_RED + "Invalid number: " + params[0]);
             }
+            ws.connect(auth, gameID);
             state = State.IN_GAME;
             team = "white";
             drawBoard();
@@ -192,7 +213,6 @@ public class ChessClient {
             return SET_TEXT_COLOR_RED + "Color must be White or Black\n";
         }
         if(params.length == 2){
-            int gameID;
             try{
                 try {
                     gameID = Integer.parseInt(params[0]);
@@ -204,12 +224,7 @@ public class ChessClient {
                 }
                 JoinGameRequest request = new JoinGameRequest(auth, params[1].toLowerCase(), gameID);
                 server.joinGame(request);
-                Collection<GameData> games = server.listGames(new ListGamesRequest(auth)).games();
-                for(GameData data: games){
-                    if(data.gameID() == gameID){
-                        game = data;
-                    }
-                }
+                ws.connect(auth, gameID);
             } catch (ResponseException e) {
                 throw ResponseException.printCode(e);
             }
@@ -221,8 +236,7 @@ public class ChessClient {
             } else{
                 team = "black";
             }
-            drawBoard();
-            return RESET + String.format("You join game #%s as %s\n.", id, color);
+            return RESET + String.format("You join game #%s as %s.\n", id, color);
         }
         return SET_TEXT_COLOR_RED + "Too many inputs\n";
     }
@@ -364,25 +378,27 @@ public class ChessClient {
     }
 
     private void drawBoard(){
+        System.out.print("\n");
         drawHeader();
         drawSquares();
         drawHeader();
     }
 
     private void drawSquares(){
-        String[] numbers = {"8","7","6","5","4","3","2","1"};
         int color = 1;
         ChessPiece piece;
-        ChessBoard board = game.game().getBoard();
-        int start = 1;
-        int way = 1;
+        ChessBoard board = game.getBoard();
+        int rowStart = 8;
+        int colStart = 1;
+        int way = -1;
         if(team != null && team.equals("black")){
-            start = 8;
-            way = -1;
+            rowStart = 1;
+            colStart = 8;
+            way = 1;
         }
-        for(int row = start; row <= 8 && row >= 1; row += way){
-            System.out.print(BACKGROUND + " " + numbers[row - 1] + " ");
-            for(int col = start; col <= 8 && col >= 1; col += way){
+        for(int row = rowStart; row <= 8 && row >= 1; row += way){
+            System.out.print(BACKGROUND + " " + row + " ");
+            for(int col = colStart; col <= 8 && col >= 1; col -= way){
                 piece = board.getPiece(new ChessPosition(row, col));
                 if(color == 1){
                     System.out.print(WHITE_SPACE);
@@ -393,7 +409,7 @@ public class ChessClient {
                 System.out.print(getPiece(piece));
             }
             color *= -1;
-            System.out.println(BACKGROUND + " " + numbers[row - 1] + " " + RESET);
+            System.out.println(BACKGROUND + " " + row + " " + RESET);
         }
     }
 
@@ -432,6 +448,31 @@ public class ChessClient {
             case "n" -> BLACK_KNIGHT;
             case "p" -> BLACK_PAWN;
             default -> " ";
+        };
+    }
+
+    private ChessMove parseMove(String start, String end, ChessPiece.PieceType promotion){
+        char row = start.charAt(1);
+        char col = start.charAt(0);
+
+        ChessPosition startPos = new ChessPosition(row - '0', col - 'a' + 1);
+
+        row = end.charAt(1);
+        col = end.charAt(0);
+
+        ChessPosition endPos = new ChessPosition(row - '0', col - 'a' + 1);
+
+        return new ChessMove(startPos, endPos, promotion);
+    }
+
+    private ChessPiece.PieceType parsePiece(String piece){
+        return switch (piece.toLowerCase()){
+            case "king" -> ChessPiece.PieceType.KING;
+            case "queen" -> ChessPiece.PieceType.QUEEN;
+            case "rook" -> ChessPiece.PieceType.ROOK;
+            case "bishop" -> ChessPiece.PieceType.BISHOP;
+            case "knight" -> ChessPiece.PieceType.KNIGHT;
+            default -> null;
         };
     }
 }
