@@ -21,6 +21,7 @@ import websocket.messages.NotificationMessage;
 
 
 import java.io.IOException;
+import java.util.Objects;
 
 public class WebSocketHandler implements WsConnectHandler, WsMessageHandler, WsCloseHandler {
 
@@ -139,7 +140,16 @@ public class WebSocketHandler implements WsConnectHandler, WsMessageHandler, WsC
     }
 
     private void resign(Session session, String username, UserGameCommand command) throws IOException, DataAccessException {
-        service.gameOver(command.getGameID());
+        if(Objects.equals(connections.sessions.get(session), "an observer")){
+            var error = new ErrorMessage("Observer cannot resign");
+            session.getRemote().sendString(new Gson().toJson(error));
+            return;
+        }
+        if(!service.gameOver(command.getGameID())){
+            var error = new ErrorMessage("Game is already over");
+            session.getRemote().sendString(new Gson().toJson(error));
+            return;
+        }
         var message = String.format("%s resigned", username);
         var notification = new NotificationMessage(message);
         connections.broadcast(command.getGameID(),null, notification);

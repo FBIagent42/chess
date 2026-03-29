@@ -82,10 +82,14 @@ public class GameService extends Service{
         return gameDAO.getGame(gameID).game();
     }
 
-    public void gameOver(int gameID) throws DataAccessException {
+    public boolean gameOver(int gameID) throws DataAccessException {
         GameData data = gameDAO.getGame(gameID);
         ChessGame game =  data.game();
+        if(game.isGameOver()){
+            return false;
+        }
         game.setGameOver(true);
         gameDAO.updateGame(new GameData(data.gameID(), data.whiteUsername(), data.blackUsername(), data.gameName(), game));
+        return true;
     }
 }
