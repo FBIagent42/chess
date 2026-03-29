@@ -92,4 +92,13 @@ public class GameService extends Service{
         gameDAO.updateGame(new GameData(data.gameID(), data.whiteUsername(), data.blackUsername(), data.gameName(), game));
         return true;
     }
+
+    public void leaveGame(int gameID, String color) throws DataAccessException {
+        GameData data = gameDAO.getGame(gameID);
+        if(Objects.equals(color, "white")){
+            gameDAO.updateGame(new GameData(data.gameID(), null, data.blackUsername(), data.gameName(), data.game()));
+        } else if(Objects.equals(color, "black")){
+            gameDAO.updateGame(new GameData(data.gameID(), null, data.blackUsername(), data.gameName(), data.game()));
+        }
+    }
 }
