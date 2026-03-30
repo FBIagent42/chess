@@ -20,7 +20,9 @@ import websocket.messages.NotificationMessage;
 
 
 import java.io.IOException;
+import java.util.Map;
 import java.util.Objects;
+import java.util.Set;
 
 public class WebSocketHandler implements WsConnectHandler, WsMessageHandler, WsCloseHandler {
 
@@ -59,8 +61,26 @@ public class WebSocketHandler implements WsConnectHandler, WsMessageHandler, WsC
     }
 
     @Override
-    public void handleClose(WsCloseContext ctx) {
+    public void handleClose(WsCloseContext ctx) throws DataAccessException {
+        emergencyLogout(ctx);
         System.out.println("Websocket closed");
+    }
+
+    private void emergencyLogout(WsCloseContext ctx) throws DataAccessException {
+        for (Map.Entry<Integer, Set<Session>> entry : connections.connections.entrySet()) {
+            Integer gameID = entry.getKey();
+            Set<Session> game = entry.getValue();
+            String color;
+
+            for(Session session: game){
+                if(ctx.session == session) {
+                    color = connections.sessions.get(session);
+                    service.leaveGame(gameID, color);
+                    connections.remove(gameID, session);
+                    return;
+                }
+            }
+        }
     }
 
     private void move(Session session, String username, MakeMoveCommand command) throws DataAccessException, InvalidMoveException, IOException {
