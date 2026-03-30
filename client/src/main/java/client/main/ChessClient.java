@@ -118,8 +118,9 @@ public class ChessClient implements NotificationHandler {
             if(piece.length() != 2){
                 return SET_TEXT_COLOR_RED + "position need to be in format \"a4\"\n";
             }
-
-            return RESET + String.format("List of possible moves for piece at %s", piece);
+            ChessPosition pos = parsePos(piece);
+            drawBoard(game.validMoves(pos));
+            return RESET;
         }
         if(params.length < 1) {
             return SET_TEXT_COLOR_RED + "Not enough inputs, requires: <Position>\n";
@@ -377,13 +378,17 @@ public class ChessClient implements NotificationHandler {
     }
 
     private void drawBoard(){
+        drawBoard(null);
+    }
+
+    private void drawBoard(Collection<ChessMove> possMoves){
         System.out.print("\n");
         drawHeader();
-        drawSquares();
+        drawSquares(possMoves);
         drawHeader();
     }
 
-    private void drawSquares(){
+    private void drawSquares(Collection<ChessMove> possMoves){
         int color = 1;
         ChessPiece piece;
         ChessBoard board = game.getBoard();
@@ -395,14 +400,33 @@ public class ChessClient implements NotificationHandler {
             colStart = 8;
             way = 1;
         }
+
+        List<ChessPosition> endPos = new ArrayList<>();
+        ChessPosition startPos = null;
+        if(possMoves != null){
+            for(ChessMove move: possMoves){
+                endPos.add(move.getEndPosition());
+                if(startPos == null) {
+                    startPos = move.getStartPosition();
+                }
+            }
+        }
+
         for(int row = rowStart; row <= 8 && row >= 1; row += way){
             System.out.print(BACKGROUND + " " + row + " ");
             for(int col = colStart; col <= 8 && col >= 1; col -= way){
-                piece = board.getPiece(new ChessPosition(row, col));
-                if(color == 1){
-                    System.out.print(WHITE_SPACE);
-                } else{
-                    System.out.print(BLACK_SPACE);
+                ChessPosition end = new ChessPosition(row, col);
+                piece = board.getPiece(end);
+                if(endPos.contains(end)){
+                    System.out.print(SET_BG_COLOR_GREEN);
+                } else if(end.equals(startPos)){
+                    System.out.print(SET_BG_COLOR_YELLOW);
+                }else {
+                    if (color == 1) {
+                        System.out.print(WHITE_SPACE);
+                    } else {
+                        System.out.print(BLACK_SPACE);
+                    }
                 }
                 color *= -1;
                 System.out.print(getPiece(piece));
@@ -451,17 +475,14 @@ public class ChessClient implements NotificationHandler {
     }
 
     private ChessMove parseMove(String start, String end, ChessPiece.PieceType promotion){
-        char row = start.charAt(1);
-        char col = start.charAt(0);
+        return new ChessMove(parsePos(start), parsePos(end), promotion);
+    }
 
-        ChessPosition startPos = new ChessPosition(row - '0', col - 'a' + 1);
+    private ChessPosition parsePos(String pos){
+        char row = pos.charAt(1);
+        char col = pos.charAt(0);
 
-        row = end.charAt(1);
-        col = end.charAt(0);
-
-        ChessPosition endPos = new ChessPosition(row - '0', col - 'a' + 1);
-
-        return new ChessMove(startPos, endPos, promotion);
+        return new ChessPosition(row - '0', col - 'a' + 1);
     }
 
     private ChessPiece.PieceType parsePiece(String piece){
