@@ -3,8 +3,8 @@ package client.main;
 
 
 import chess.*;
-import client.main.WebSocket.NotificationHandler;
-import client.main.WebSocket.WebSocketFacade;
+import client.main.websocket.NotificationHandler;
+import client.main.websocket.WebSocketFacade;
 import model.GameData;
 import model.requests.*;
 import model.resulsts.LoginResult;

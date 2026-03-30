@@ -1,4 +1,4 @@
-package server.WebSocket;
+package server.websocket;
 
 import chess.*;
 import com.google.gson.Gson;
@@ -38,11 +38,9 @@ public class WebSocketHandler implements WsConnectHandler, WsMessageHandler, WsC
 
     @Override
     public void handleMessage(WsMessageContext ctx) throws IOException {
-        int gameID = -1;
         Session session = ctx.session;
         try {
             MakeMoveCommand command = new Gson().fromJson(ctx.message(), MakeMoveCommand.class);
-            gameID = command.getGameID();
             String username = service.verifyAuth(command.getAuthToken());
             switch (command.getCommandType()) {
                 case CONNECT -> connect(ctx.session, username, command);

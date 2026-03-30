@@ -2,7 +2,7 @@ package server;
 
 import handler.*;
 import io.javalin.*;
-import server.WebSocket.WebSocketHandler;
+import server.websocket.WebSocketHandler;
 
 public class Server {
 
